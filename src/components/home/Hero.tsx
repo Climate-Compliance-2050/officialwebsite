@@ -144,8 +144,11 @@ export function Hero() {
                   Territories
                 </li>
                 <li className="flex items-center gap-1.5">
-                  <span className="h-px w-3.5 bg-blue-300/80" aria-hidden />
-                  Feeds
+                  <span
+                    className="h-2.5 w-2.5 border border-green-400/60 bg-green-400/15"
+                    aria-hidden
+                  />
+                  Evidence grid
                 </li>
               </ul>
               <CoordTicker />

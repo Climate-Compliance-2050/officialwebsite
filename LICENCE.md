@@ -14,8 +14,6 @@ Copyright © 2026 Climate Compliance 2050. All rights reserved.
   Software.
 - **"You"** means any individual or legal entity that accesses, copies, holds,
   or otherwise comes into possession of the Software or any part of it.
-- **"Licence Key"** means a signed authorisation token issued by the Licensor
-  that enables a given deployment of the Software.
 
 ## 2. Ownership
 
@@ -49,45 +47,35 @@ You **may not**:
 4. Distribute, sublicense, sell, rent, lease, or lend the Software;
 5. Reverse engineer, decompile, or disassemble any part of the Software, except
    to the limited extent such restriction is prohibited by applicable law;
-6. Remove, alter, or obscure any copyright, trademark, Licence Key, or other
-   proprietary notice;
-7. Circumvent, disable, or tamper with the licence-enforcement mechanisms
-   described in `LICENCE-PROTECTION.md`, including domain locking, Licence Key
-   verification, or boot-time validation.
+6. Remove, alter, or obscure any copyright, trademark, or other proprietary
+   notice.
 
-## 5. Licence Key and Enforcement
-
-The Software contains technical measures that verify a valid Licence Key and
-restrict execution to authorised domains. These measures are a protected part
-of the Software. Any attempt to bypass, forge, or disable them is a material
-breach of this licence and may also violate applicable anti-circumvention law.
-
-## 6. Confidentiality
+## 5. Confidentiality
 
 The Software constitutes confidential information and trade secrets of the
 Licensor. You must hold it in strict confidence and not disclose it to any third
 party.
 
-## 7. Termination
+## 6. Termination
 
 Any breach of this licence terminates all rights granted to You automatically
 and immediately. On termination You must cease all use and destroy all copies of
 the Software in Your possession or control.
 
-## 8. No Warranty
+## 7. No Warranty
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
 
-## 9. Limitation of Liability
+## 8. Limitation of Liability
 
 IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM,
 OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## 10. Governing Law
+## 9. Governing Law
 
 This licence shall be governed by and construed in accordance with the laws of
 the jurisdiction in which the Licensor is established, without regard to its

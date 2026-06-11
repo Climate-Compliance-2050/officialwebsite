@@ -19,6 +19,7 @@ export default function ServicesPage() {
       <PageHero
         {...servicesPage.hero}
         media={{ src: "/images/services-hero.webp" }}
+        particles
       >
         {/* lifecycle rail: anchor stepper across the asset life */}
         <Reveal delay={0.15}>

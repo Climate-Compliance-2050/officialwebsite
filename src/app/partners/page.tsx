@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function PartnersPage() {
   return (
     <>
-      <PageHero {...partnersPage.hero} />
+      <PageHero {...partnersPage.hero} particles />
 
       <section className="bg-white py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -26,11 +26,13 @@ export default function PartnersPage() {
 
           <div className="mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8">
             {partnersPage.partners.map((partner, i) => (
-              <Reveal
-                key={partner.name}
-                delay={i * 0.08}
-                className="flex flex-col rounded-2xl border border-navy-900/8 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy-900/8"
-              >
+              <Reveal key={partner.name} delay={i * 0.08} className="flex">
+                <a
+                  href={partner.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-1 flex-col rounded-2xl border border-navy-900/8 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy-900/8"
+                >
                 <div className="flex h-20 items-center">
                   <Image
                     src={partner.logo}
@@ -42,6 +44,7 @@ export default function PartnersPage() {
                 </div>
                 <h2 className="mt-5 text-lg font-semibold text-navy-900">{partner.name}</h2>
                 <p className="mt-2.5 text-sm leading-6 text-navy-900/65">{partner.body}</p>
+                </a>
               </Reveal>
             ))}
           </div>

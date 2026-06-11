@@ -4,8 +4,7 @@ import type { NextConfig } from "next";
  * Anti-copy hardening. None of this makes client-side JavaScript uncopyable —
  * anything shipped to a browser can be read. These settings raise the effort
  * bar: no leaked source maps, no framework fingerprint, no stray console noise,
- * and headers that stop other sites embedding the app. Real enforcement lives
- * in src/instrumentation.ts (boot) and src/proxy.ts (per request).
+ * and headers that stop other sites embedding the app.
  */
 const nextConfig: NextConfig = {
   // Never ship readable source maps to the browser in production.
@@ -30,11 +29,6 @@ const nextConfig: NextConfig = {
       {
         key: "Permissions-Policy",
         value: "camera=(), microphone=(), geolocation=()",
-      },
-      // Assert proprietary ownership in the wire response.
-      {
-        key: "X-Licence",
-        value: "C2050 proprietary — all rights reserved — see LICENCE.md",
       },
     ];
 

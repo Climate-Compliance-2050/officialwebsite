@@ -6,7 +6,7 @@ import { ChevronRight, ArrowDown, Layers } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { fiveLayers } from "@/content/site";
 
-/** Accent ramp: Territory (earth green) → Regulatory (regulatory blue). */
+/** Accent ramp: Territory (earth green) → Science (regulatory blue). */
 const ACCENTS = ["#00b050", "#16a36a", "#2c8bca", "#317ec0", "#345faa"];
 
 export function FiveLayers() {

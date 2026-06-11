@@ -229,16 +229,19 @@ export const partnersPage = {
     {
       name: "Ludovino Lopes Advogados",
       logo: "/partners/ludovino-lopes.webp",
+      url: "https://www.ludovinolopes.com.br/",
       body: "A reference law firm in environmental, climate and carbon-market law, bringing deep legal expertise to the structuring and assessment of environmental assets.",
     },
     {
       name: "GEAP",
       logo: "/partners/geap.webp",
+      url: "https://geap.global/",
       body: "Geospatial analysis and applied environmental intelligence supporting territorial assessment at scale.",
     },
     {
       name: "Yakarana",
       logo: "/partners/yakarana.webp",
+      url: "https://www.yakarana.com/",
       body: "Climate education and market capacity-building, strengthening the foundations of a high-integrity carbon economy.",
     },
   ],

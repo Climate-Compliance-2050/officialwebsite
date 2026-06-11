@@ -94,16 +94,6 @@ export const fiveLayers = {
       body: "Satellite imagery, boundary verification, land-use dynamics and overlap detection for the physical asset base.",
     },
     {
-      name: "Science",
-      title: "Scientific Intelligence",
-      body: "Carbon-stock models, baselines, additionality indicators and MRV evidence assessed against current science.",
-    },
-    {
-      name: "Technical",
-      title: "Technical Intelligence",
-      body: "Methodology conformance, data quality and quantification integrity across the project's technical documentation.",
-    },
-    {
       name: "Legal",
       title: "Legal Intelligence",
       body: "Land tenure, carbon rights, contractual chains and benefit-sharing structures mapped to applicable law.",
@@ -112,6 +102,16 @@ export const fiveLayers = {
       name: "Regulatory",
       title: "Regulatory Intelligence",
       body: "Article 6, CORSIA, national frameworks and registry rules: eligibility and compliance status, monitored as rules evolve.",
+    },
+    {
+      name: "Technical",
+      title: "Technical Intelligence",
+      body: "Methodology conformance, data quality and quantification integrity across the project's technical documentation.",
+    },
+    {
+      name: "Science",
+      title: "Scientific Intelligence",
+      body: "Carbon-stock models, baselines, additionality indicators and MRV evidence assessed against current science.",
     },
   ],
   outcome: {

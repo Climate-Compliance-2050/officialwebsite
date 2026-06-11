@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function EcosystemPage() {
   return (
     <>
-      <PageHero {...ecosystemPage.hero} />
+      <PageHero {...ecosystemPage.hero} particles />
 
       {/* Orbit diagram on dark */}
       <section className="dark-section bg-navy-950 pb-20 text-white lg:pb-28">

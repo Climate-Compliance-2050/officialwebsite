@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function ProductsPage() {
   return (
     <>
-      <PageHero {...productsPage.hero} />
+      <PageHero {...productsPage.hero} particles />
 
       {/* Platform + modules */}
       <section className="bg-white py-20 lg:py-28">

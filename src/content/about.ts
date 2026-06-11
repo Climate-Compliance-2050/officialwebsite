@@ -62,42 +62,52 @@ export const leadershipPage = {
     headline: "Scientific, legal and operational mastery.",
     body: "Solving the climate crisis requires more than capital. Our leadership unites experience from global finance, international environmental law and advanced geospatial science to build infrastructure for the environmental asset market.",
   },
-  team: [
+  // Tier 1 — C-suite, direction & strategy.
+  executive: [
     {
       name: "Ludovino Lopes",
       role: "Chairman & CEO",
       bio: "International climate and environmental lawyer with over 30 years' experience in legal and regulatory interpretation of environmental assets and services.",
       photo: "/team/ludovino-lopes.webp",
+      linkedin: "https://www.linkedin.com/in/ludovinolopes/",
     },
     {
       name: "Alan Barry",
       role: "COO & CFO",
       bio: "Senior chartered accountant with over 25 years of banking, asset management and real-estate private equity experience.",
       photo: "/team/alan-barry.webp",
+      linkedin: "https://www.linkedin.com/in/alan-barry-450a4434/",
     },
     {
       name: "Mauricio Meira",
       role: "CCO & CSO",
       bio: "Engineer and Master of Science with over 20 years of experience using geospatial technology for natural resource monitoring.",
       photo: "/team/mauricio-meira.webp",
+      linkedin: "https://www.linkedin.com/in/mbmeira/",
     },
+  ],
+  // Tier 2 — operating team, delivery & analysis.
+  team: [
     {
       name: "Guilherme Lopes",
       role: "Head of Operations",
       bio: "Specialist in climate operations and value investing, driving the operational cost frameworks for projects.",
       photo: "/team/guilherme-lopes.webp",
+      linkedin: "https://www.linkedin.com/in/guilherme-ludovino-lopes/",
     },
     {
       name: "Giovani Bino",
       role: "Head of Product",
       bio: "Expert in physical geography with over a decade of experience coordinating advanced geospatial intelligence and remote sensing projects.",
       photo: "/team/giovani-bino.webp",
+      linkedin: "https://www.linkedin.com/in/giovani-bino/",
     },
     {
       name: "Raul Barros",
       role: "Operations Analyst",
       bio: "Experience in regulatory intelligence and operational efficiency, integrating scientific rigor with strategic business management.",
       photo: "/team/raul-barros.webp",
+      linkedin: "https://www.linkedin.com/in/raulpaesdebarros/",
     },
   ],
 };

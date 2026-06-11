@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function OurStoryPage() {
   return (
     <>
-      <PageHero {...storyPage.hero} />
+      <PageHero {...storyPage.hero} particles />
 
       {/* Timeline */}
       <section className="bg-white py-20 lg:py-28">

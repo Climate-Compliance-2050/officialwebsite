@@ -26,19 +26,6 @@ export const MONITOR_SITES: MonitorSite[] = [
   { name: "Mekong", lonLat: [104.9, 12.2] },
 ];
 
-/** Intelligence feeds: [territory index, hub index] */
-export const MONITOR_ARCS: [number, number][] = [
-  [2, 1],
-  [3, 1],
-  [4, 1],
-  [5, 1],
-  [6, 0],
-  [7, 0],
-  [8, 0],
-  [9, 0],
-  [1, 0],
-];
-
 export function formatLonLat([lon, lat]: [number, number]): string {
   const ns = `${Math.abs(lat).toFixed(1)}°${lat >= 0 ? "N" : "S"}`;
   const ew = `${Math.abs(lon).toFixed(1)}°${lon >= 0 ? "E" : "W"}`;
