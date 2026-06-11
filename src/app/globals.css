@@ -1,0 +1,288 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- C2050 brand: green ---- */
+  --color-green-50: #eaf7ee;
+  --color-green-100: #c0e7c9;
+  --color-green-200: #b0e1bc;
+  --color-green-300: #92d5a2;
+  --color-green-400: #65c47b;
+  --color-green-500: #00b050; /* brand primary green — accents/fills only, not body text on white */
+  --color-green-600: #00984a;
+  --color-green-700: #007a3d;
+  --color-green-800: #005c2e;
+  --color-green-900: #00401f;
+
+  /* ---- C2050 brand: blue ---- */
+  --color-blue-50: #eef3fa;
+  --color-blue-100: #d7e3f4;
+  --color-blue-200: #a9c4e8;
+  --color-blue-300: #2c8bca;
+  --color-blue-400: #2e84c5;
+  --color-blue-500: #317ec0;
+  --color-blue-600: #345faa; /* brand primary blue */
+  --color-blue-700: #2a4d8c;
+  --color-blue-800: #213d70;
+  --color-blue-900: #182c52;
+
+  /* ---- deep navy "mission control" register ---- */
+  --color-navy-500: #2a4470;
+  --color-navy-600: #1f3660;
+  --color-navy-700: #16294a;
+  --color-navy-800: #0e1f38;
+  --color-navy-900: #0a1628;
+  --color-navy-950: #060d1a;
+
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  /* ---- sharp technical corners: 1–3px across the whole radius scale ---- */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 3px;
+  --radius-3xl: 3px;
+  --radius-4xl: 3px;
+
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* ---- brand mark (aperture) lens rotation: very slow, ambient ---- */
+  --animate-spin-slow: spin-slow 120s linear infinite;
+  --animate-spin-slower: spin-slow 200s linear infinite reverse;
+
+  @keyframes spin-slow {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ---- Data Cube instrument: orbits, scan, core ---- */
+  --animate-orbit-a: orbit 24s linear infinite;
+  --animate-orbit-b: orbit 38s linear infinite reverse;
+  --animate-scan: cube-scan 7.5s ease-in-out infinite;
+  --animate-core: core-pulse 5.5s ease-in-out infinite;
+  --animate-feed: beam-feed 2.6s linear infinite;
+  --animate-twinkle: twinkle 4.2s ease-in-out infinite;
+  --animate-lock: spin-slow 26s linear infinite;
+
+  @keyframes orbit {
+    to {
+      transform: rotateZ(360deg);
+    }
+  }
+  @keyframes cube-scan {
+    0%,
+    100% {
+      transform: translateY(-190px);
+      opacity: 0;
+    }
+    12% {
+      opacity: 0.55;
+    }
+    50% {
+      transform: translateY(190px);
+      opacity: 0.55;
+    }
+    88% {
+      opacity: 0;
+    }
+  }
+  /* data particle travelling from a cube face to the intersection node */
+  @keyframes beam-feed {
+    0% {
+      transform: translateX(var(--beam-len, 140px)) scale(1);
+      opacity: 0;
+    }
+    14% {
+      opacity: 1;
+    }
+    88% {
+      opacity: 0.9;
+    }
+    100% {
+      transform: translateX(4px) scale(0.4);
+      opacity: 0;
+    }
+  }
+  @keyframes core-pulse {
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(0.88);
+    }
+    50% {
+      opacity: 0.85;
+      transform: scale(1.12);
+    }
+  }
+  /* constellation layer node — gentle independent twinkle */
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: scale(0.82);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.12);
+    }
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f1c2e;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-green-500);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-green-500);
+  outline-offset: 2px;
+}
+
+.dark-section :focus-visible {
+  outline-color: var(--color-green-400);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* tabular figures for stats */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- film grain overlay for dark sections ---- */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ---- reticle corner brackets (top-left + bottom-right) ---- */
+.corners::before,
+.corners::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.corners::before {
+  top: -1px;
+  left: -1px;
+  border-top: 1.5px solid var(--corner-color, var(--color-green-500));
+  border-left: 1.5px solid var(--corner-color, var(--color-green-500));
+}
+.corners::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 1.5px solid var(--corner-color, var(--color-green-500));
+  border-right: 1.5px solid var(--corner-color, var(--color-green-500));
+}
+.corners-blue {
+  --corner-color: var(--color-blue-400);
+}
+.corners-faint {
+  --corner-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ---- gradient hairline along a section's top edge ---- */
+.hairline-top::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(0, 176, 80, 0.55) 35%,
+    rgba(49, 126, 192, 0.55) 65%,
+    transparent 95%
+  );
+}
+
+/* ---- light sweep across primary buttons on hover ---- */
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.btn-sheen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -75%;
+  width: 50%;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.45s ease;
+}
+.btn-sheen:hover::before {
+  left: 125%;
+}
+
+/* ---- nav link underline grow ---- */
+.nav-underline {
+  position: relative;
+}
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.3rem;
+  height: 2px;
+  background: var(--color-green-500);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+.nav-underline:hover::after,
+.nav-underline[aria-expanded="true"]::after {
+  transform: scaleX(1);
+}
