@@ -52,3 +52,6 @@ assets/
 
 # licence protection (local only)
 LICENCE-PROTECTION.md
+
+# review screenshots (local only)
+/review-shots/
