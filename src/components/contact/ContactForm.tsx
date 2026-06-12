@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { contactPage } from "@/content/about";
 
@@ -18,6 +18,27 @@ export function ContactForm() {
   const { form } = contactPage;
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const formRef = useRef<HTMLFormElement>(null);
+  const bannerRef = useRef<HTMLDivElement>(null);
+  const studyNameRef = useRef<HTMLSpanElement>(null);
+
+  // Prefill from a deep link like /contact?study=Land%20Eligibility (Services page).
+  // Read on mount via window.location to avoid forcing a Suspense boundary; reveal
+  // the banner imperatively so there's no setState-in-effect / hydration mismatch.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("study");
+    if (!requested) return;
+    const el = formRef.current;
+    if (!el) return;
+    const message = el.elements.namedItem("message") as HTMLTextAreaElement | null;
+    if (message && !message.value) {
+      message.value = `I'd like to request the "${requested}" study. Here is some context about my parcel, project or jurisdiction:\n\n`;
+    }
+    const interest = el.elements.namedItem("interest") as HTMLSelectElement | null;
+    if (interest) interest.value = "Assess an asset or territory";
+    if (studyNameRef.current) studyNameRef.current.textContent = requested;
+    bannerRef.current?.removeAttribute("hidden");
+  }, []);
 
   const validateField = (name: string, value: string) => {
     let message = "";
@@ -71,7 +92,17 @@ export function ContactForm() {
     }`;
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-5">
+    <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-5">
+      <div
+        ref={bannerRef}
+        hidden
+        className="flex items-center gap-2.5 rounded-sm border border-green-600/25 bg-green-50 px-4 py-3"
+      >
+        <span aria-hidden className="h-2 w-2 shrink-0 rounded-full bg-green-500" />
+        <p className="text-sm text-navy-900/80">
+          Requesting: <span ref={studyNameRef} className="font-semibold text-navy-900" /> study
+        </p>
+      </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-navy-900">

@@ -1,9 +1,10 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Image from "next/image";
-import { Landmark } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
+import { StudiesFunnel } from "@/components/services/StudiesFunnel";
 import { servicesPage } from "@/content/ecosystem";
 
 export const metadata: Metadata = {
@@ -11,9 +12,27 @@ export const metadata: Metadata = {
   description: servicesPage.hero.body,
 };
 
-const slug = (s: string) => s.toLowerCase().replace(/[^a-z]+/g, "-");
+/** Aperture/lens styling per discipline tone. Static class strings (Tailwind-safe). */
+const lensTone = {
+  blue: {
+    ring: "border-blue-600/25",
+    dash: "border-blue-600/40",
+    inner: "border-blue-600/50",
+    dot: "bg-blue-600",
+    label: "text-blue-700",
+  },
+  green: {
+    ring: "border-green-600/25",
+    dash: "border-green-600/45",
+    inner: "border-green-600/55",
+    dot: "bg-green-600",
+    label: "text-green-700",
+  },
+} as const;
 
 export default function ServicesPage() {
+  const { valueProp, catalogue } = servicesPage;
+
   return (
     <>
       <PageHero
@@ -21,107 +40,133 @@ export default function ServicesPage() {
         media={{ src: "/images/services-hero.webp" }}
         particles
       >
-        {/* lifecycle rail: anchor stepper across the asset life */}
         <Reveal delay={0.15}>
-          <nav aria-label="Asset lifecycle" className="mt-10">
-            <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-3">
-              {servicesPage.stages.map((stage, i) => (
-                <li key={stage.stage} className="flex items-center gap-1.5">
-                  <a
-                    href={`#${slug(stage.stage)}`}
-                    className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 py-1.5 pl-1.5 pr-4 text-xs font-semibold text-white/80 backdrop-blur-sm transition-colors hover:border-green-400/60 hover:bg-green-400/10 hover:text-white"
-                  >
-                    <span className="tnum flex h-5 w-5 items-center justify-center rounded-full bg-green-400/15 text-[11px] text-green-300 transition-colors group-hover:bg-green-400 group-hover:text-navy-950">
-                      {i + 1}
-                    </span>
-                    {stage.stage}
-                  </a>
-                  {i < servicesPage.stages.length - 1 && (
-                    <span aria-hidden className="text-white/20">
-                      →
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </nav>
+          <div className="mt-8 flex flex-wrap items-center gap-3 font-mono text-xs uppercase tracking-[0.15em] text-white/70">
+            <span className="rounded-sm border border-white/15 bg-white/5 px-3 py-1.5">
+              Legal &amp; Regulatory
+            </span>
+            <span aria-hidden className="text-white/30">
+              &times;
+            </span>
+            <span className="rounded-sm border border-white/15 bg-white/5 px-3 py-1.5">
+              Geospatial
+            </span>
+            <span aria-hidden className="text-white/30">
+              &rarr;
+            </span>
+            <span className="rounded-sm border border-green-400/30 bg-green-400/10 px-3 py-1.5 text-green-300">
+              Hard information
+            </span>
+          </div>
         </Reveal>
       </PageHero>
 
-      <section className="bg-white py-20 lg:py-24">
+      {/* Value proposition: two disciplines focused into one integrated study. */}
+      <section className="bg-white py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="space-y-16">
-            {servicesPage.stages.map((stage, i) => (
-              <div key={stage.stage}>
-                <Reveal className="scroll-mt-28">
-                  <div id={slug(stage.stage)} className="grid gap-8 lg:grid-cols-12">
-                    <div className="lg:col-span-4 lg:sticky lg:top-28 lg:self-start">
-                      <p className="tnum text-sm font-semibold text-green-600">
-                        Stage {String(i + 1).padStart(2, "0")}
+          <SectionHeading
+            eyebrow={valueProp.eyebrow}
+            headline={valueProp.headline}
+            body={valueProp.body}
+          />
+
+          <Reveal delay={0.1}>
+            <div className="relative mt-16">
+              {/* optical axis connecting the two lenses through the study */}
+              <div
+                aria-hidden
+                className="absolute inset-x-0 top-1/2 hidden h-px -translate-y-1/2 bg-gradient-to-r from-blue-600/0 via-navy-900/25 to-green-600/0 lg:block"
+              />
+              <div className="relative grid gap-12 lg:grid-cols-3 lg:items-center lg:gap-8">
+                {/* lens 1 — Legal & Regulatory (blue) */}
+                {(() => {
+                  const lens = valueProp.lenses[0];
+                  const t = lensTone[lens.tone];
+                  return (
+                    <div className="relative z-10 flex flex-col items-center bg-white px-4 text-center">
+                      <div className="relative grid h-28 w-28 place-items-center">
+                        <span className={`absolute inset-0 rounded-full border ${t.ring}`} />
+                        <span
+                          className={`absolute inset-[0.6rem] rounded-full border border-dashed ${t.dash} animate-spin-slow`}
+                        />
+                        <span className={`absolute inset-[1.3rem] rounded-full border ${t.inner}`} />
+                        <span className={`h-2.5 w-2.5 rounded-full ${t.dot}`} />
+                      </div>
+                      <p className={`mt-5 font-mono text-xs uppercase tracking-[0.15em] ${t.label}`}>
+                        {lens.label}
                       </p>
-                      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-navy-900 sm:text-3xl">
-                        {stage.stage}
-                      </h2>
-                      <p className="mt-3 text-sm leading-6 text-navy-900/60">{stage.intro}</p>
+                      <p className="mt-1.5 max-w-[15rem] font-mono text-[11px] leading-5 text-navy-900/50">
+                        {lens.note}
+                      </p>
                     </div>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:col-span-8">
-                      {stage.services.map((service) => (
-                        <div
-                          key={service.name}
-                          className="group rounded-2xl border border-navy-900/8 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-green-600/20 hover:shadow-lg hover:shadow-navy-900/8"
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <h3 className="text-base font-semibold text-navy-900">{service.name}</h3>
-                            {service.jurisdictional && (
-                              <span className="inline-flex shrink-0 items-center gap-1 rounded-sm bg-blue-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-700">
-                                <Landmark className="h-3 w-3" aria-hidden />
-                                Jurisdictional
-                              </span>
-                            )}
-                          </div>
-                          <p className="mt-2.5 text-sm leading-6 text-navy-900/65">{service.body}</p>
-                        </div>
-                      ))}
-                    </div>
+                  );
+                })()}
+
+                {/* the study — what both lenses resolve to */}
+                <div className="relative z-10 mx-auto flex flex-col items-center bg-white px-4 text-center">
+                  <div className="corners relative h-32 w-48 overflow-hidden rounded-sm ring-1 ring-navy-900/10">
+                    <Image
+                      src="/images/services-land.webp"
+                      alt="Aerial view of land divided into geometric parcels"
+                      fill
+                      sizes="192px"
+                      className="object-cover object-center"
+                    />
+                    <div className="absolute inset-0 bg-navy-950/25" />
                   </div>
-                </Reveal>
+                  <p className="mt-5 font-mono text-xs uppercase tracking-[0.15em] text-navy-900">
+                    {valueProp.converge}
+                  </p>
+                  <p className="mt-1.5 font-mono text-[11px] text-navy-900/50">
+                    georeferenced · decision-grade
+                  </p>
+                </div>
 
-                {/* cinematic breather mid-catalogue */}
-                {i === 2 && (
-                  <Reveal delay={0.05} className="mt-16">
-                    <figure className="relative isolate overflow-hidden rounded-3xl">
-                      <Image
-                        src="/images/services-land.webp"
-                        alt="Aerial view of cultivated land divided into geometric parcels"
-                        width={1920}
-                        height={1078}
-                        sizes="(min-width: 1280px) 1216px, 100vw"
-                        className="h-56 w-full object-cover object-center sm:h-64 lg:h-72"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-r from-navy-950/90 via-navy-950/55 to-navy-950/20" />
-                      <figcaption className="absolute inset-0 flex flex-col justify-center p-8 sm:p-12">
-                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-green-300">
-                          Evidence-based
-                        </p>
-                        <p className="mt-3 max-w-xl text-lg font-medium leading-snug text-white sm:text-2xl">
-                          Every assessment traces back to the land itself: geospatial
-                          truth, not assumption.
-                        </p>
-                      </figcaption>
-                    </figure>
-                  </Reveal>
-                )}
-
-                {i < servicesPage.stages.length - 1 && (
-                  <div aria-hidden className="mt-16 h-px bg-navy-900/8" />
-                )}
+                {/* lens 2 — Geospatial (green) */}
+                {(() => {
+                  const lens = valueProp.lenses[1];
+                  const t = lensTone[lens.tone];
+                  return (
+                    <div className="relative z-10 flex flex-col items-center bg-white px-4 text-center">
+                      <div className="relative grid h-28 w-28 place-items-center">
+                        <span className={`absolute inset-0 rounded-full border ${t.ring}`} />
+                        <span
+                          className={`absolute inset-[0.6rem] rounded-full border border-dashed ${t.dash} animate-spin-slower`}
+                        />
+                        <span className={`absolute inset-[1.3rem] rounded-full border ${t.inner}`} />
+                        <span className={`h-2.5 w-2.5 rounded-full ${t.dot}`} />
+                      </div>
+                      <p className={`mt-5 font-mono text-xs uppercase tracking-[0.15em] ${t.label}`}>
+                        {lens.label}
+                      </p>
+                      <p className="mt-1.5 max-w-[15rem] font-mono text-[11px] leading-5 text-navy-900/50">
+                        {lens.note}
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
-            ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* The funnel: filterable catalogue of studies along a core-sample descent. */}
+      <section className="hairline-top relative bg-slate-50 py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <SectionHeading
+            eyebrow={catalogue.eyebrow}
+            headline={catalogue.headline}
+            body={catalogue.body}
+            align="left"
+          />
+          <div className="mt-12">
+            <StudiesFunnel studies={servicesPage.studies} filters={servicesPage.filters} />
           </div>
         </div>
       </section>
 
-      {/* closing cinematic band: earth observation + CTA */}
+      {/* Closing band: scope-it CTA over earth observation. */}
       <section className="dark-section grain relative isolate overflow-hidden bg-navy-950 text-white">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <Image
@@ -136,19 +181,19 @@ export default function ServicesPage() {
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
           <Reveal className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-green-400">
-              Earth observation
+            <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-green-400">
+              Where to start
             </p>
             <h2 className="mt-4 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
-              Decisions grounded in what the planet actually shows.
+              Not sure which study you need? We&apos;ll scope it with you.
             </h2>
             <p className="mt-5 text-base leading-7 text-white/70 sm:text-lg">
-              Scientific, legal and regulatory rigour across the full lifecycle of an
-              environmental asset. Not sure where yours sits? We&apos;ll map it.
+              Tell us about your parcel, project or jurisdiction. We&apos;ll map it to the
+              right study — from a first screening to a validation-ready evidence base.
             </p>
             <div className="mt-9 flex flex-wrap gap-4">
               <ButtonLink href="/contact" arrow>
-                Assess an Asset
+                Request a study
               </ButtonLink>
               <ButtonLink href="/products" variant="ghost-dark">
                 Explore the platform

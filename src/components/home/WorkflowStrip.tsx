@@ -14,8 +14,6 @@ import { servicesPage } from "@/content/ecosystem";
 /** Accent ramp across the lifecycle: origination green → regulatory blue. */
 const ACCENTS = ["#00b050", "#0fa45a", "#16a36a", "#2c8bca", "#317ec0", "#345faa"];
 
-const slug = (s: string) => s.toLowerCase().replace(/[^a-z]+/g, "-");
-
 /** Dial geometry: node i sits on a circle of radius 41 (viewBox units), 12 o'clock first. */
 const NODE_POS = workflow.steps.map((_, i) => {
   const angle = (i / workflow.steps.length) * Math.PI * 2;
@@ -70,7 +68,9 @@ export function WorkflowStrip() {
   };
 
   const accent = ACCENTS[active];
-  const stage = servicesPage.stages[active];
+  const stageName = steps[active].name;
+  // Studies offered at the active lifecycle phase (single source of truth: the funnel).
+  const stageStudies = servicesPage.studies.filter((s) => s.stage === stageName);
 
   return (
     <section className="hairline-top relative overflow-hidden bg-slate-50 py-20 lg:py-28">
@@ -222,27 +222,29 @@ export function WorkflowStrip() {
                     {steps[active].body}
                   </p>
 
-                  <div className="mt-6 border-t border-navy-900/8 pt-5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-navy-900/40">
-                      Services at this stage
-                    </p>
-                    <ul className="mt-3 flex flex-wrap gap-2">
-                      {stage.services.map((service) => (
-                        <li
-                          key={service.name}
-                          className="rounded-sm border border-navy-900/10 bg-slate-50 px-3 py-1.5 text-xs font-medium text-navy-900/75"
-                        >
-                          {service.name}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {stageStudies.length > 0 && (
+                    <div className="mt-6 border-t border-navy-900/8 pt-5">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-navy-900/40">
+                        Studies at this stage
+                      </p>
+                      <ul className="mt-3 flex flex-wrap gap-2">
+                        {stageStudies.map((study) => (
+                          <li
+                            key={study.name}
+                            className="rounded-sm border border-navy-900/10 bg-slate-50 px-3 py-1.5 text-xs font-medium text-navy-900/75"
+                          >
+                            {study.name}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   <Link
-                    href={`/services#${slug(stage.stage)}`}
+                    href="/services"
                     className="group mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-semibold text-green-700 transition-colors hover:text-green-600"
                   >
-                    Explore {stage.stage} services
+                    {stageStudies.length > 0 ? `Explore ${stageName} studies` : "See all studies"}
                     <ArrowRight
                       className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
                       aria-hidden

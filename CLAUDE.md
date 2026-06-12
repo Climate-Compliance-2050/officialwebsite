@@ -73,6 +73,14 @@ adviser. Never write or imply that C2050 *issues credits, certifies projects, ve
 validates,* or *gives investment advice.* This is a compliance company — wrong wording
 is a legal problem, not a style nit.
 
+**The differentiator — always foreground it:** C2050's edge over every other player
+is that it **integrates legal & regulatory analysis with geospatial data** — the
+nuances of land tenure and applicable legislation are *locked to coordinates* through a
+proprietary framework (the Data Cube). Competitors do geospatial *or* legal; C2050 binds
+them. Every record carries this legal⊕geospatial bind as its core, across all licensing
+tiers. When presenting the platform or products, make this integration the hero, not a
+feature in a list.
+
 **Color** (hex from globals.css):
 - Primary green `#00b050` — accents and fills only. **Not body text on white** (fails
   contrast). Used for reticle brackets, focus outline, selection, nav underline.
