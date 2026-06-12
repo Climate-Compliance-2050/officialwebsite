@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from "next";
 import Image from "next/image";
 import { PageHero } from "@/components/ui/PageHero";
-import { Particles } from "@/components/ui/Particles";
+import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
@@ -12,27 +12,23 @@ export const metadata: Metadata = {
   description: aboutPage.hero.body,
 };
 
-// Brand verification seals: the data inputs every assessed asset is built on.
+// Evidence registers: the data inputs every assessed asset is built on.
 const seals = [
-  { src: "/brand/stamp-geo.webp", label: "Geospatial", note: "Satellite & remote-sensing origin" },
-  { src: "/brand/stamp-jurisdiction.webp", label: "Jurisdictional", note: "Territorial & sovereign rights" },
-  { src: "/brand/stamp-legal.webp", label: "Legal", note: "Compliance & regulatory posture" },
+  { code: "GEO", label: "Geospatial", note: "Satellite & remote-sensing origin" },
+  { code: "JUR", label: "Jurisdictional", note: "Territorial & sovereign rights" },
+  { code: "LEG", label: "Legal", note: "Compliance & regulatory posture" },
 ];
 
 export default function AboutPage() {
   const { dataCube, techFoundation, focus } = aboutPage;
   return (
     <>
-      <PageHero {...aboutPage.hero} particles />
+      <PageHero {...aboutPage.hero} />
 
       {/* Data Cube deep-dive */}
       <section className="dark-section grain relative overflow-hidden bg-navy-950 pb-20 text-white lg:pb-28">
-        {/* ambient backdrop: glows + drifting information-chain constellation */}
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-24 right-[-12%] h-[26rem] w-[26rem] rounded-full bg-blue-800/20 blur-3xl" />
-          <div className="absolute -bottom-32 left-[-10%] h-[22rem] w-[22rem] rounded-full bg-green-800/15 blur-3xl" />
-          <Particles className="opacity-50" linkColor="49,126,192" color="rgba(101,196,123,0.65)" />
-        </div>
+        {/* ambient backdrop: graticule + survey washes */}
+        <SurveyBackdrop ticks={false} />
         {/* oversized brand mark watermark */}
         <Image
           src="/brand/mark-white.webp"
@@ -46,10 +42,10 @@ export default function AboutPage() {
         <div className="relative mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8 lg:pt-28">
           <div className="grid items-center gap-14 lg:grid-cols-2">
             <Reveal>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-green-400">
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
                 {dataCube.eyebrow}
               </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+              <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
                 {dataCube.headline}
               </h2>
               <p className="mt-5 text-base leading-7 text-white/70">{dataCube.body}</p>
@@ -96,15 +92,15 @@ export default function AboutPage() {
                   );
                 })}
               </ol>
-              <p className="mt-6 text-center text-xs text-white/40">
+              <p className="mt-6 text-center text-xs text-white/60">
                 Hover each level: raw data ascends into a structured, evidence-based asset profile.
               </p>
             </div>
           </div>
 
-          {/* verification seals: the credibility chain made tangible */}
+          {/* evidence registers: the credibility chain made tangible */}
           <div className="mt-16 border-t border-white/10 pt-10">
-            <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-white/40">
+            <p className="text-center font-mono text-xs font-medium uppercase tracking-[0.18em] text-white/55">
               Every asset carries a verifiable chain of evidence
             </p>
             <ul className="mt-8 grid gap-6 sm:grid-cols-3">
@@ -113,19 +109,17 @@ export default function AboutPage() {
                   as="li"
                   key={seal.label}
                   delay={i * 0.08}
-                  className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.03] p-5 transition-colors duration-200 hover:border-green-400/30 hover:bg-green-500/[0.06]"
+                  className="flex items-center gap-4 rounded-sm border border-white/8 bg-white/[0.03] p-5 transition-colors duration-200 hover:border-green-400/30 hover:bg-green-500/[0.06]"
                 >
-                  <Image
-                    src={seal.src}
-                    alt=""
+                  <span
                     aria-hidden
-                    width={56}
-                    height={56}
-                    className="shrink-0 drop-shadow-[0_0_12px_rgba(0,176,80,0.35)]"
-                  />
+                    className="corners relative flex h-12 w-14 shrink-0 items-center justify-center border border-white/12 bg-white/[0.04] font-mono text-[11px] font-semibold tracking-[0.08em] text-green-300"
+                  >
+                    {seal.code}
+                  </span>
                   <div>
                     <p className="text-sm font-semibold text-white">{seal.label}</p>
-                    <p className="mt-1 text-xs leading-5 text-white/55">{seal.note}</p>
+                    <p className="mt-1 text-xs leading-5 text-white/60">{seal.note}</p>
                   </div>
                 </Reveal>
               ))}
@@ -239,7 +233,7 @@ export default function AboutPage() {
               height={64}
               className="mx-auto mb-8"
             />
-            <h2 className="text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
+            <h2 className="font-serif text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
               {focus.headline}
             </h2>
             <p className="mt-5 text-base leading-7 text-navy-900/70 sm:text-lg sm:leading-8">

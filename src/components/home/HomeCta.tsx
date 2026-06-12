@@ -1,25 +1,14 @@
 import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
-import { Particles } from "@/components/ui/Particles";
-import { homeCta } from "@/content/site";
+import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
+import { homeCta, surveyDatum } from "@/content/site";
 
 export function HomeCta() {
   return (
-    <section className="dark-section grain hairline-top relative overflow-hidden py-24 text-white lg:py-32">
-      <Image
-        src="/images/cta-aerial.webp"
-        alt=""
-        fill
-        sizes="100vw"
-        className="object-cover"
-        aria-hidden
-      />
-      {/* brand overlay treatment: navy/blue at ~80% */}
-      <div aria-hidden className="absolute inset-0 bg-navy-950/80" />
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-blue-900/40 to-green-900/30" />
-      {/* drifting constellation + oversized brand mark bleeding off the right edge */}
-      <Particles className="opacity-40" />
+    <section className="dark-section grain hairline-top relative overflow-hidden bg-gradient-to-b from-navy-900 to-navy-950 py-24 text-white lg:py-32">
+      <SurveyBackdrop datum={{ x: "14%", y: "72%", label: surveyDatum.saoPaulo }} />
+      {/* oversized brand mark bleeding off the right edge */}
       <Image
         src="/brand/mark-white.webp"
         alt=""
@@ -30,7 +19,7 @@ export function HomeCta() {
       />
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
         <Reveal>
-          <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+          <h2 className="font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
             {homeCta.headline}
           </h2>
         </Reveal>

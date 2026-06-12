@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function OurStoryPage() {
   return (
     <>
-      <PageHero {...storyPage.hero} particles />
+      <PageHero {...storyPage.hero} />
 
       {/* Timeline */}
       <section className="bg-white py-20 lg:py-28">
@@ -28,7 +28,7 @@ export default function OurStoryPage() {
                       aria-hidden
                       className="absolute -left-[2.45rem] top-3 h-[2px] w-4 bg-green-500"
                     />
-                    <p className="text-sm font-semibold uppercase tracking-wider text-green-700">
+                    <p className="font-mono text-xs font-medium uppercase tracking-[0.16em] text-green-700">
                       {item.period}
                     </p>
                     <h2 className="mt-1.5 text-xl font-semibold text-navy-900">{item.title}</h2>
@@ -52,7 +52,7 @@ export default function OurStoryPage() {
                   {/* brand 80% overlay treatment */}
                   <div aria-hidden className="absolute inset-0 bg-green-700/20" />
                 </div>
-                <figcaption className="mt-3 text-xs text-navy-900/45">
+                <figcaption className="mt-3 text-xs text-navy-900/55">
                   From territory to trusted environmental asset intelligence.
                 </figcaption>
               </Reveal>
@@ -72,7 +72,7 @@ export default function OurStoryPage() {
             >
               <Quote className="h-7 w-7 text-green-400" aria-hidden />
               <blockquote className="mt-4">
-                <p className="text-lg font-medium leading-relaxed text-white/90">
+                <p className="font-serif text-lg italic leading-relaxed text-white/90">
                   “{quote.text}”
                 </p>
                 <footer className="mt-5 text-sm text-white/55">
@@ -88,7 +88,7 @@ export default function OurStoryPage() {
       <section className="bg-white py-20 lg:py-24">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <Reveal>
-            <h2 className="text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
+            <h2 className="font-serif text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
               {storyPage.scale.headline}
             </h2>
             <p className="mt-5 text-base leading-7 text-navy-900/70 sm:text-lg sm:leading-8">

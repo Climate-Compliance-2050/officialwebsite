@@ -159,11 +159,16 @@ export const productsPage = {
   badges: {
     headline: "Smart Compliance Badges",
     body: "Configurable indicators, not accreditation. Badges signal that an asset meets criteria you define: geospatial integrity, jurisdictional alignment or legal review status. Every badge traces to the underlying evidence in the Data Cube.",
-    stamps: [
-      { src: "/brand/stamp-geo.webp", label: "Geospatial criteria" },
-      { src: "/brand/stamp-jurisdiction.webp", label: "Jurisdictional criteria" },
-      { src: "/brand/stamp-legal.webp", label: "Legal criteria" },
+    /* Evidence plaques — rectangular, instrument-style. Deliberately NOT seals or
+       rosettes: C2050 does not certify, and the visual must not imply it. Strings
+       are drawn from `body` above — no new claims. */
+    aside: "Configurable indicators · not accreditation",
+    plaques: [
+      { code: "GEO", label: "Geospatial criteria", signal: "Geospatial integrity" },
+      { code: "JUR", label: "Jurisdictional criteria", signal: "Jurisdictional alignment" },
+      { code: "LEG", label: "Legal criteria", signal: "Legal review status" },
     ],
+    evidence: "Data Cube record",
   },
 };
 

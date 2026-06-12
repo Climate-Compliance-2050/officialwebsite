@@ -14,6 +14,7 @@ import {
 } from "framer-motion";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
+import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
 import { dataCube } from "@/content/site";
 
 /* ------------------------------------------------------------------ *
@@ -151,7 +152,7 @@ function TerritoryMap({ active }: { active: boolean }) {
         <span className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border border-green-300/80" />
         <span className="absolute -left-0.5 -top-0.5 h-1 w-1 rounded-full bg-green-200 shadow-[0_0_8px_2px_rgba(101,196,123,0.9)]" />
       </div>
-      <span className="absolute bottom-2 right-2.5 font-mono text-[9px] tracking-[0.14em] text-green-200/70">
+      <span className="absolute bottom-2 right-2.5 font-mono text-[10px] tracking-[0.14em] text-green-200/70">
         −3.4653 · −62.2159
       </span>
     </div>
@@ -204,7 +205,7 @@ function GlassFace({
         <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/10 to-transparent" />
       )}
       {/* index + label */}
-      <span className="absolute left-3 top-2.5 font-mono text-[10px] tracking-[0.2em] text-white/40">
+      <span className="absolute left-3 top-2.5 font-mono text-[10px] tracking-[0.18em] text-white/55">
         {face.index}
       </span>
       <span
@@ -622,14 +623,7 @@ export function DataCubeTeaser() {
 
   return (
     <section className="dark-section grain hairline-top relative overflow-hidden bg-navy-900 py-20 text-white lg:py-28">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-32 top-0 h-[28rem] w-[28rem] rounded-full bg-blue-700/20 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-24 bottom-0 h-[24rem] w-[24rem] rounded-full bg-green-700/15 blur-3xl"
-      />
+      <SurveyBackdrop ticks={false} />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-14 lg:grid-cols-2">
           {/* ---------------- Cube instrument ---------------- */}
@@ -753,7 +747,7 @@ export function DataCubeTeaser() {
               {/* telemetry HUD */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 font-mono text-[10px] uppercase tracking-[0.18em] text-white/35"
+                className="pointer-events-none absolute inset-0 font-mono text-[10px] uppercase tracking-[0.18em] text-white/55"
               >
                 <div className="absolute left-3 top-3 leading-relaxed">
                   <div className="text-green-300/70">2050 · CUBE</div>
@@ -817,12 +811,12 @@ export function DataCubeTeaser() {
                                     : "text-blue-200"
                                   : busy
                                     ? "animate-pulse text-white/80"
-                                    : "text-white/25"
+                                    : "text-white/40"
                               }
                             >
                               {ok ? "✓" : busy ? "⟳" : "·"}
                             </span>
-                            <span className={ok || busy ? "flex-1 text-white/85" : "flex-1 text-white/35"}>
+                            <span className={ok || busy ? "flex-1 text-white/85" : "flex-1 text-white/50"}>
                               {face.label}
                             </span>
                             {ok ? (
@@ -830,10 +824,10 @@ export function DataCubeTeaser() {
                                 <span className={green ? "text-green-300/70" : "text-blue-200/70"}>
                                   {vRows[i]?.hash}
                                 </span>
-                                <span className="tnum text-white/35">{vRows[i]?.time}</span>
+                                <span className="tnum text-white/50">{vRows[i]?.time}</span>
                               </>
                             ) : (
-                              <span className="text-white/30">{busy ? "verifying…" : "queued"}</span>
+                              <span className="text-white/45">{busy ? "validating…" : "queued"}</span>
                             )}
                           </li>
                         );
@@ -862,10 +856,10 @@ export function DataCubeTeaser() {
           {/* ---------------- Copy + interactive layers ---------------- */}
           <div className="order-1 lg:order-2">
             <Reveal>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-green-400">
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
                 {dataCube.eyebrow}
               </p>
-              <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+              <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
                 {dataCube.headline}
               </h2>
               <p className="mt-5 text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
@@ -900,7 +894,7 @@ export function DataCubeTeaser() {
                       />
                       <span className="flex-1">
                         <span className="block font-medium">{layer.label}</span>
-                        <span className="block text-xs text-white/45">{layer.detail}</span>
+                        <span className="block text-xs text-white/60">{layer.detail}</span>
                       </span>
                       <span
                         className={`font-mono text-[10px] uppercase tracking-[0.18em] transition-opacity duration-300 ${

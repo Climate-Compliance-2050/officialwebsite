@@ -38,7 +38,7 @@ function TierHeader({ label }: { label: string }) {
 export default function LeadershipPage() {
   return (
     <>
-      <PageHero eyebrow={hero.eyebrow} headline={hero.headline} body={hero.body} particles />
+      <PageHero eyebrow={hero.eyebrow} headline={hero.headline} body={hero.body} />
 
       <section className="hairline-top relative bg-white py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -64,7 +64,7 @@ export default function LeadershipPage() {
                     aria-label={`${m.name} on LinkedIn`}
                     className="block h-full"
                   >
-                  <article className="group relative flex h-full flex-col overflow-hidden border border-navy-900/10 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-navy-900/15 hover:shadow-xl hover:shadow-navy-900/10">
+                  <article className="group relative flex h-full flex-col overflow-hidden border border-navy-900/10 bg-white shadow-sm transition duration-300 hover:border-navy-900/20 hover:shadow-lg hover:shadow-navy-900/10">
                     <span
                       aria-hidden
                       className="absolute inset-y-0 left-0 z-10 w-[3px] transition-all duration-300 group-hover:w-1"
@@ -97,7 +97,7 @@ export default function LeadershipPage() {
                         />
                       </div>
                       <div className="relative min-w-0">
-                        <span className="font-mono text-[0.7rem] font-semibold tracking-[0.18em] text-navy-900/40">
+                        <span className="font-mono text-[0.7rem] font-semibold tracking-[0.18em] text-navy-900/50">
                           {`0${i + 1}`}
                         </span>
                         <h3 className="mt-1 text-lg font-semibold leading-tight text-navy-900">{m.name}</h3>
@@ -129,7 +129,7 @@ export default function LeadershipPage() {
                     aria-label={`${m.name} on LinkedIn`}
                     className="block h-full"
                   >
-                  <article className="group relative flex h-full flex-col overflow-hidden border border-navy-900/10 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-navy-900/15 hover:shadow-lg hover:shadow-navy-900/10">
+                  <article className="group relative flex h-full flex-col overflow-hidden border border-navy-900/10 bg-white p-5 shadow-sm transition duration-300 hover:border-navy-900/20 hover:shadow-md hover:shadow-navy-900/10">
                     <span
                       aria-hidden
                       className="absolute inset-y-0 left-0 w-[3px] transition-all duration-300 group-hover:w-1"
@@ -175,10 +175,10 @@ export default function LeadershipPage() {
               }}
             />
             <div className="relative">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-green-400">
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
                 Work with us
               </p>
-              <h2 className="mx-auto mt-3 max-w-2xl text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">
+              <h2 className="mx-auto mt-3 max-w-2xl font-serif text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl">
                 Assessing assets across your portfolio? This is the team to talk to.
               </h2>
               <div className="mt-7 flex flex-wrap items-center justify-center gap-3">

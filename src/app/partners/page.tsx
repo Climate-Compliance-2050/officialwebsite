@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import Image from "next/image";
 import { Quote } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function PartnersPage() {
   return (
     <>
-      <PageHero {...partnersPage.hero} particles />
+      <PageHero {...partnersPage.hero} />
 
       <section className="bg-white py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -31,7 +31,7 @@ export default function PartnersPage() {
                   href={partner.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex flex-1 flex-col rounded-2xl border border-navy-900/8 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-navy-900/8"
+                  className="reticle relative flex flex-1 flex-col rounded-sm border border-navy-900/10 bg-white p-8 shadow-sm transition-colors duration-300 hover:border-green-600/40"
                 >
                 <div className="flex h-20 items-center">
                   <Image
@@ -52,8 +52,8 @@ export default function PartnersPage() {
           <Reveal delay={0.15} className="mx-auto mt-16 max-w-3xl">
             <blockquote className="rounded-2xl bg-slate-50 p-10 text-center">
               <Quote className="mx-auto h-8 w-8 text-green-500" aria-hidden />
-              <p className="mt-5 text-xl font-medium leading-relaxed text-navy-900">
-                “{partnersPage.quote.text}”
+              <p className="mt-5 font-serif text-xl italic leading-relaxed text-navy-900">
+                “{partnersPage.quote.text}”
               </p>
               <footer className="mt-5 text-sm text-navy-900/60">
                 <span className="font-semibold text-navy-900">{partnersPage.quote.author}</span> ·{" "}

@@ -49,7 +49,7 @@ export function LicensingStudio({ tiers, billing, dna }: Props) {
       {/* Billing model — seat licences (term switch) + the separate pay-as-you-go lane */}
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-sm border border-navy-900/10 bg-white p-5 shadow-sm">
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-navy-900/45">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-navy-900/55">
             Seat licences
           </p>
           <div
@@ -87,7 +87,7 @@ export function LicensingStudio({ tiers, billing, dna }: Props) {
           <p className="mt-2 text-sm leading-6 text-navy-900/65">{billing.payg.note}</p>
         </div>
       </div>
-      <p className="mt-3 text-xs leading-5 text-navy-900/45">{billing.quote}</p>
+      <p className="mt-3 text-xs leading-5 text-navy-900/55">{billing.quote}</p>
 
       {/* The platform — a full-width instrument tablet. Navy "mission-control"
           bezel (grain finish) framing a light, frosted-glass screen. */}
@@ -106,11 +106,11 @@ export function LicensingStudio({ tiers, billing, dna }: Props) {
             <span aria-hidden className="animate-spin-slow relative inline-block h-4 w-4">
               <Image src="/brand/mark-white.webp" alt="" fill sizes="1rem" className="object-contain" />
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/65">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/70">
               C2050 · Asset Intelligence
             </span>
           </span>
-          <span className="hidden font-mono text-[10px] uppercase tracking-[0.22em] text-white/35 sm:inline">
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-white/55 sm:inline">
             Licensing console
           </span>
         </div>
@@ -123,10 +123,10 @@ export function LicensingStudio({ tiers, billing, dna }: Props) {
             {/* shared DNA — identical across every tier */}
             <div className="reticle relative rounded-sm border border-green-600/25 bg-white/55 p-4 backdrop-blur-md sm:p-5">
               <div className="flex items-baseline justify-between gap-3">
-                <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-green-700">
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-green-700">
                   {dna.eyebrow}
                 </p>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-navy-900/35">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-navy-900/50">
                   {dna.aside}
                 </span>
               </div>
@@ -156,10 +156,10 @@ export function LicensingStudio({ tiers, billing, dna }: Props) {
 
         {/* bottom bezel — balances the frame; the legal⊕geospatial signature etch */}
         <div className="relative flex items-center justify-between px-1.5 pb-0.5 pt-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-white/35">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/55">
             Legal ⊕ Geospatial
           </span>
-          <span className="hidden font-mono text-[9px] uppercase tracking-[0.22em] text-white/20 sm:inline">
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-white/40 sm:inline">
             Data Cube framework
           </span>
         </div>
@@ -182,10 +182,9 @@ function Atmosphere() {
           backgroundSize: "44px 44px",
         }}
       />
-      {/* soft brand glows */}
-      <div className="absolute -left-24 -top-28 h-80 w-80 rounded-full bg-green-400/35 blur-3xl" />
-      <div className="absolute -bottom-32 right-[-6%] h-96 w-96 rounded-full bg-blue-500/25 blur-3xl" />
-      <div className="absolute left-1/3 top-1/4 h-64 w-64 rounded-full bg-green-300/20 blur-3xl" />
+      {/* directional brand washes — edge-anchored, no floating blobs */}
+      <div className="absolute inset-0 bg-[linear-gradient(148deg,rgba(101,196,123,0.20)_0%,transparent_34%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(328deg,rgba(49,126,192,0.16)_0%,transparent_38%)]" />
       {/* topographic contours — tinted green/blue, slightly stronger */}
       <svg
         className="absolute inset-0 h-full w-full"
@@ -208,7 +207,7 @@ function TierBox({ tier, mode }: { tier: Tier; mode?: BillingMode }) {
   const footer = tier.admin ? "Deployment" : `${mode?.label ?? ""} · seat licence`;
   return (
     <div
-      className={`group reticle relative flex h-full flex-col rounded-sm border p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_-20px_rgba(15,28,46,0.5)] sm:p-5 ${
+      className={`group reticle relative flex h-full flex-col rounded-sm border p-4 backdrop-blur-md transition-all duration-300 hover:shadow-[0_14px_36px_-22px_rgba(15,28,46,0.45)] sm:p-5 ${
         tier.highlight
           ? "border-green-500/45 bg-white/75 ring-1 ring-green-500/20 hover:bg-white/90"
           : "border-navy-900/12 bg-white/45 hover:border-green-500/40 hover:bg-white/85"
@@ -228,16 +227,16 @@ function TierBox({ tier, mode }: { tier: Tier; mode?: BillingMode }) {
         <span className="tnum font-mono text-xs font-semibold text-navy-900/45 transition-colors group-hover:text-green-700">
           {tier.code}
         </span>
-        <span className="rounded-sm bg-navy-900/[0.05] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-navy-900/45">
+        <span className="rounded-sm bg-navy-900/[0.05] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-navy-900/55">
           {tier.access}
         </span>
         {tier.highlight && (
-          <span className="ml-auto rounded-sm bg-green-500/12 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-green-700">
+          <span className="ml-auto rounded-sm bg-green-500/12 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-green-700">
             Most adopted
           </span>
         )}
         {tier.admin && (
-          <span className="ml-auto rounded-sm bg-blue-600/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-blue-700">
+          <span className="ml-auto rounded-sm bg-blue-600/10 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-blue-700">
             White label
           </span>
         )}
@@ -248,7 +247,7 @@ function TierBox({ tier, mode }: { tier: Tier; mode?: BillingMode }) {
 
       {/* who it suits */}
       <div className="mt-3 border-t border-navy-900/8 pt-3">
-        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-navy-900/40">
+        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-navy-900/50">
           Best suited for
         </p>
         <p className="mt-1 text-xs leading-5 text-navy-900/70">{tier.bestFor}</p>
@@ -271,7 +270,7 @@ function TierBox({ tier, mode }: { tier: Tier; mode?: BillingMode }) {
       </ul>
 
       <div className="mt-auto flex items-center justify-between gap-2 pt-4">
-        <span className="font-mono text-[9px] uppercase tracking-wider text-navy-900/30">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-navy-900/45">
           {footer}
         </span>
         <Link

@@ -340,7 +340,7 @@ function SiteLabel({
       zIndexRange={[10, 0]}
       wrapperClass="pointer-events-none"
     >
-      <div className="flex select-none items-center whitespace-nowrap rounded-sm border border-white/15 bg-navy-950/85 px-2 py-0.5 font-mono text-[9px] font-medium uppercase tracking-[0.14em] text-white/85 shadow-lg shadow-navy-950/50 backdrop-blur-sm">
+      <div className="flex select-none items-center whitespace-nowrap rounded-sm border border-white/15 bg-navy-950/85 px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-white/85 shadow-lg shadow-navy-950/50 backdrop-blur-sm">
         {name}
       </div>
     </Html>

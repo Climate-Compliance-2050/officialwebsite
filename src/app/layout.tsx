@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Mono, IBM_Plex_Serif } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -19,6 +19,15 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
+/* Display voice only: H1/H2 and the hero caption. Body stays Plex Sans. */
+const plexSerif = IBM_Plex_Serif({
+  variable: "--font-plex-serif",
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: {
     default: `${site.name} · ${site.tagline}`,
@@ -30,6 +39,9 @@ export const metadata: Metadata = {
     siteName: site.legalName,
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
@@ -38,7 +50,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plexSans.variable} ${plexMono.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${plexSans.variable} ${plexMono.variable} ${plexSerif.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
         <a
           href="#main"

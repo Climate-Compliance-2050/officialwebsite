@@ -97,7 +97,7 @@ export function StudiesFunnel({ studies, filters }: Props) {
         {/* Core-sample rail — sticky depth gauge. Desktop only. */}
         <aside className="hidden lg:col-span-3 lg:block" aria-hidden>
           <div className="sticky top-28">
-            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-navy-900/45">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-navy-900/55">
               Depth of study
             </p>
             <div className="mt-5 flex gap-4">
@@ -123,7 +123,7 @@ export function StudiesFunnel({ studies, filters }: Props) {
                 ))}
               </ol>
             </div>
-            <p className="mt-6 max-w-[12rem] text-xs leading-5 text-navy-900/45">
+            <p className="mt-6 max-w-[12rem] text-xs leading-5 text-navy-900/55">
               Brazil-scale: a study can resolve from a single parcel down to one
               municipality.
             </p>
@@ -145,7 +145,7 @@ export function StudiesFunnel({ studies, filters }: Props) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
                   transition={{ duration: 0.4, ease: [0.21, 0.65, 0.36, 1] }}
-                  className={`reticle group relative mb-4 overflow-hidden rounded-sm border border-navy-900/10 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-navy-900/20 hover:shadow-lg hover:shadow-navy-900/8 ${
+                  className={`reticle group relative mb-4 overflow-hidden rounded-sm border border-navy-900/10 bg-white shadow-sm transition-all duration-300 hover:border-navy-900/20 hover:shadow-md hover:shadow-navy-900/8 ${
                     territory ? "reticle-blue" : ""
                   }`}
                 >
@@ -197,8 +197,8 @@ export function StudiesFunnel({ studies, filters }: Props) {
                             Jurisdictional
                           </span>
                         )}
-                        <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-navy-900/40">
-                          <span className="text-navy-900/30">Resolves to</span>
+                        <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-navy-900/60">
+                          <span className="text-navy-900/45">Resolves to</span>
                           {study.granularity}
                         </span>
                       </div>
@@ -209,7 +209,7 @@ export function StudiesFunnel({ studies, filters }: Props) {
                       <p className="mt-2 text-sm leading-6 text-navy-900/65">{study.body}</p>
 
                       <div className="mt-4 border-t border-navy-900/8 pt-4">
-                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-navy-900/40">
+                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-navy-900/50">
                           What you get
                         </p>
                         <p className="mt-1.5 text-sm leading-6 text-navy-900/80">

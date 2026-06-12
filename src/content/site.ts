@@ -57,6 +57,12 @@ export const monitor = {
   survey: "Survey · Brazil · 6 biomes",
 };
 
+/** Survey datum labels etched into dark-section backdrops — the two operational hubs. */
+export const surveyDatum = {
+  dublin: "53.3498° N · 6.2603° W",
+  saoPaulo: "23.5505° S · 46.6333° W",
+};
+
 export const stats = [
   { value: 900, suffix: "+", label: "Project records screened" },
   { value: 5, suffix: "", label: "Intelligence layers integrated" },

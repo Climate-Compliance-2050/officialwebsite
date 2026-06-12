@@ -21,7 +21,7 @@ export function SectionHeading({
     <Reveal className={`max-w-3xl ${alignCls}`}>
       {eyebrow && (
         <p
-          className={`text-sm font-semibold uppercase tracking-[0.18em] ${
+          className={`font-mono text-xs font-medium uppercase tracking-[0.18em] ${
             dark ? "text-green-400" : "text-green-700"
           }`}
         >
@@ -29,7 +29,7 @@ export function SectionHeading({
         </p>
       )}
       <h2
-        className={`mt-3 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15] ${
+        className={`mt-3 font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15] ${
           dark ? "text-white" : "text-navy-900"
         }`}
       >

@@ -35,6 +35,8 @@
 
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+  /* display voice — H1/H2 and pull-quotes only, never body */
+  --font-serif: var(--font-plex-serif), Georgia, "Times New Roman", serif;
 
   /* ---- sharp technical corners: 1–3px across the whole radius scale ---- */
   --radius-xs: 1px;

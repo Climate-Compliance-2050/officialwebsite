@@ -56,7 +56,7 @@ export function Footer() {
           <div className="grid grid-cols-2 gap-8 lg:col-span-4">
             {footer.columns.map((col) => (
               <div key={col.title}>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/45">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-white/55">
                   {col.title}
                 </h3>
                 <ul className="mt-4 space-y-3">
@@ -77,21 +77,21 @@ export function Footer() {
 
           {/* Disclaimer */}
           <div className="lg:col-span-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/45">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/55">
               Important
             </h3>
-            <p className="mt-4 text-xs leading-5 text-white/55">{footer.disclaimer}</p>
+            <p className="mt-4 text-xs leading-5 text-white/65">{footer.disclaimer}</p>
           </div>
         </div>
 
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-white/45">{footer.copyright}</p>
+          <p className="text-xs text-white/60">{footer.copyright}</p>
           <div className="flex gap-6">
             {footer.legal.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xs text-white/45 transition-colors hover:text-white/80"
+                className="text-xs text-white/60 transition-colors hover:text-white/90"
               >
                 {link.label}
               </Link>

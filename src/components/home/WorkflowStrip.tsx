@@ -141,7 +141,7 @@ export function WorkflowStrip() {
                   height={72}
                   className="h-14 w-14 drop-shadow-sm sm:h-[72px] sm:w-[72px]"
                 />
-                <span className="tnum mt-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-navy-900/45">
+                <span className="tnum mt-2 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-navy-900/55">
                   Stage {String(active + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
                 </span>
               </div>
@@ -210,7 +210,7 @@ export function WorkflowStrip() {
                       style={{ backgroundColor: accent, boxShadow: `0 0 10px ${accent}` }}
                       aria-hidden
                     />
-                    <span className="tnum text-xs font-semibold uppercase tracking-[0.2em] text-navy-900/45">
+                    <span className="tnum font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-navy-900/55">
                       Stage {String(active + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
                     </span>
                   </div>
@@ -224,7 +224,7 @@ export function WorkflowStrip() {
 
                   {stageStudies.length > 0 && (
                     <div className="mt-6 border-t border-navy-900/8 pt-5">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-navy-900/40">
+                      <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-navy-900/55">
                         Studies at this stage
                       </p>
                       <ul className="mt-3 flex flex-wrap gap-2">

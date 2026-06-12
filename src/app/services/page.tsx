@@ -38,7 +38,6 @@ export default function ServicesPage() {
       <PageHero
         {...servicesPage.hero}
         media={{ src: "/images/services-hero.webp" }}
-        particles
       >
         <Reveal delay={0.15}>
           <div className="mt-8 flex flex-wrap items-center gap-3 font-mono text-xs uppercase tracking-[0.15em] text-white/70">
@@ -181,10 +180,10 @@ export default function ServicesPage() {
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
           <Reveal className="max-w-2xl">
-            <p className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-green-400">
+            <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
               Where to start
             </p>
-            <h2 className="mt-4 text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
+            <h2 className="mt-4 font-serif text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
               Not sure which study you need? We&apos;ll scope it with you.
             </h2>
             <p className="mt-5 text-base leading-7 text-white/70 sm:text-lg">

@@ -55,7 +55,7 @@ export function FiveLayers() {
         <div className="mt-14 grid gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Layer stack: the single control surface */}
           <div className="lg:col-span-5">
-            <div className="mb-3 flex items-center justify-between text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-white/40">
+            <div className="mb-3 flex items-center justify-between font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-white/55">
               <span>Intelligence stack</span>
               <span className="tnum">05 layers</span>
             </div>
@@ -109,7 +109,7 @@ export function FiveLayers() {
                     {/* tabular layer index */}
                     <span
                       className="tnum w-7 shrink-0 text-sm font-semibold tabular-nums transition-colors duration-200"
-                      style={{ color: isActive ? accent : "rgba(255,255,255,0.35)" }}
+                      style={{ color: isActive ? accent : "rgba(255,255,255,0.55)" }}
                     >
                       {String(i + 1).padStart(2, "0")}
                     </span>
@@ -121,7 +121,7 @@ export function FiveLayers() {
                       >
                         {layer.name}
                       </span>
-                      <span className="block truncate text-xs text-white/45">{layer.title}</span>
+                      <span className="block truncate text-xs text-white/60">{layer.title}</span>
                     </span>
 
                     <ChevronRight
@@ -139,7 +139,7 @@ export function FiveLayers() {
             </div>
 
             {/* convergence cue */}
-            <div className="mt-4 flex items-center gap-2 pl-1 text-xs text-white/40">
+            <div className="mt-4 flex items-center gap-2 pl-1 text-xs text-white/60">
               <ArrowDown className="h-3.5 w-3.5 text-green-400" aria-hidden />
               <span>All five resolve into one asset view</span>
             </div>
@@ -168,7 +168,7 @@ export function FiveLayers() {
                       style={{ backgroundColor: ACCENTS[active], boxShadow: `0 0 12px ${ACCENTS[active]}` }}
                       aria-hidden
                     />
-                    <span className="tnum text-xs font-semibold uppercase tracking-[0.2em] text-white/45">
+                    <span className="tnum font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-white/60">
                       Layer {String(active + 1).padStart(2, "0")} / 05 · {layers[active].name}
                     </span>
                   </div>
