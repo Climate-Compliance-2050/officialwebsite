@@ -42,13 +42,19 @@ export const nav = {
 };
 
 export const hero = {
-  eyebrow: "Legal RegTech · Geospatial Intelligence",
-  headline: "Global intelligence infrastructure for environmental asset integrity.",
+  eyebrow: "Trust runs on evidence. Evidence runs on legal & regulatory",
+  headline: "Every coordinate is subject to a law.",
   subheadline:
-    "C2050 integrates geospatial, scientific, technical, legal and regulatory intelligence to assess, structure and monitor environmental assets, starting with carbon credits, emission reductions and removals.",
+    "C2050 integrates legal and regulatory intelligence with geospatial coordinates, so every point on the map carries the rules that govern it, from carbon rights to Article 6 eligibility.",
   primaryCta: { label: "Assess an Asset", href: "/contact" },
   secondaryCta: { label: "Explore the Platform", href: "/about" },
-  caption: "From territory to trusted environmental asset intelligence.",
+  caption: "Other platforms map the territory. We map the law that governs it.",
+};
+
+/** Hero "Global Asset Monitor" console chrome. */
+export const monitor = {
+  title: "Global Asset Monitor",
+  survey: "Survey · Brazil · 6 biomes",
 };
 
 export const stats = [

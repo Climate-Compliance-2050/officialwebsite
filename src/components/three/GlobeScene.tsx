@@ -10,6 +10,11 @@ import { MONITOR_SITES } from "@/content/monitor";
 const RADIUS = 1;
 /** sweep longitude advance, rad/s — one survey revolution ≈ 52 s */
 const SCAN_SPEED = 0.12;
+/** latitude survey band advance, rad/s — secondary scan axis */
+const SCAN_LAT_SPEED = 0.07;
+const DEG = Math.PI / 180;
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+const X_AXIS = new THREE.Vector3(1, 0, 0);
 
 function lonLatToVec3(lon: number, lat: number, r = RADIUS): THREE.Vector3 {
   const phi = (90 - lat) * (Math.PI / 180);
@@ -19,6 +24,16 @@ function lonLatToVec3(lon: number, lat: number, r = RADIUS): THREE.Vector3 {
     r * Math.cos(phi),
     r * Math.sin(phi) * Math.sin(theta),
   );
+}
+
+/** Orientation that slews a given lon/lat to face the camera (front, +Z), lifted just above centre. */
+function targetQuat(lon: number, lat: number): THREE.Quaternion {
+  const theta = (lon + 180) * DEG;
+  const beta = Math.PI / 2 - theta; // yaw: bring the meridian to the camera
+  const gamma = lat * DEG - 0.05; // pitch: bring the latitude to screen centre (slight lift)
+  const qYaw = new THREE.Quaternion().setFromAxisAngle(Y_AXIS, beta);
+  const qPitch = new THREE.Quaternion().setFromAxisAngle(X_AXIS, gamma);
+  return qPitch.multiply(qYaw); // yaw first, then pitch (world axes)
 }
 
 const surveyVertex = /* glsl */ `
@@ -46,6 +61,7 @@ const surveyFragment = /* glsl */ `
 
   uniform sampler2D uSdf;
   uniform float uScan;
+  uniform float uScanLat;
   uniform vec3 uSites[SITE_COUNT];
 
   varying vec3 vPos;
@@ -124,6 +140,25 @@ const surveyFragment = /* glsl */ `
     col += green * sweepLine * (0.16 + 0.3 * land);
     col += green * (1.0 - smoothstep(0.0, 0.10, abs(ds))) * 0.05;
 
+    // secondary axis: a latitude survey band sweeps N→S in blue-teal, so the
+    // two sweeps cross-hatch the globe into a moving analysis grid.
+    float latPhase = mod(uScanLat, PI) - PI * 0.5;
+    float dLat = lat - latPhase;
+    float latLine = 1.0 - smoothstep(0.0, 0.016 + wAA, abs(dLat));
+    float latTrail = clamp(1.0 + dLat / 0.12, 0.0, 1.0) * step(latPhase, lat);
+    vec3 axisBlue = vec3(0.18, 0.52, 0.77);
+    col += axisBlue * latLine * (0.12 + 0.18 * land);
+    col += axisBlue * latTrail * land * cellLine * 0.10;
+    // intersection of the two axes — evidence flares where the survey locks
+    col += green * sweepLine * latLine * (0.5 + 0.5 * mon);
+
+    // NDVI-style vegetation index resolving in the longitude sweep's wake —
+    // land briefly blooms into a green index field, brighter over monitored biomes.
+    float ndvi = hash21(cellId * 1.93 + 7.1);
+    float veg = trail * land * smoothstep(0.25, 1.0, ndvi);
+    vec3 ndviCol = mix(vec3(0.09, 0.27, 0.15), green, ndvi);
+    col += ndviCol * veg * (0.16 + 0.28 * mon);
+
     // limb shading so the sphere keeps its form
     float nv = max(dot(normalize(vNormal), normalize(vView)), 0.0);
     col *= 0.76 + 0.24 * smoothstep(0.0, 0.5, nv);
@@ -149,6 +184,7 @@ function SurveySphere({ meshRef }: { meshRef: React.RefObject<THREE.Mesh | null>
       uniforms: {
         uSdf: { value: tex },
         uScan: { value: -0.9 }, // sweep starts over the Amazon
+        uScanLat: { value: 0 },
         uSites: {
           value: MONITOR_SITES.map((s) => lonLatToVec3(s.lonLat[0], s.lonLat[1], 1)),
         },
@@ -220,8 +256,40 @@ function bracketGeometry(s: number, arm: number) {
 const HUB_BRACKET = bracketGeometry(0.04, 0.017);
 const SITE_BRACKET = bracketGeometry(0.029, 0.012);
 
-function Marker({ position, hub }: { position: THREE.Vector3; hub?: boolean }) {
-  const color = hub ? "#3fdf85" : "#8ecdf2";
+/** Radar-style ping on the coordinate the inspector is currently reading. */
+function ActivePing({ reduce }: { reduce: boolean | null }) {
+  const ref = useRef<THREE.Mesh>(null);
+  useFrame((state) => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    // 0→1 over 2s; frozen at rest when reduced motion is requested
+    const t = reduce ? 0.0 : (state.clock.elapsedTime % 2) / 2;
+    const s = 1 + t * 1.9;
+    mesh.scale.set(s, s, s);
+    (mesh.material as THREE.MeshBasicMaterial).opacity = (1 - t) * 0.55;
+  });
+  return (
+    <mesh ref={ref}>
+      <ringGeometry args={[0.03, 0.038, 40]} />
+      <meshBasicMaterial color="#3fdf85" transparent depthWrite={false} side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
+function Marker({
+  position,
+  hub,
+  active,
+  reduce,
+}: {
+  position: THREE.Vector3;
+  hub?: boolean;
+  active?: boolean;
+  reduce?: boolean | null;
+}) {
+  // The active coordinate reads green (selected); hubs green; territories blue.
+  const color = active || hub ? "#3fdf85" : "#8ecdf2";
+  const bracket = active || hub ? HUB_BRACKET : SITE_BRACKET;
   const normal = position.clone().normalize();
   const quaternion = new THREE.Quaternion().setFromUnitVectors(
     new THREE.Vector3(0, 0, 1),
@@ -230,11 +298,24 @@ function Marker({ position, hub }: { position: THREE.Vector3; hub?: boolean }) {
 
   return (
     <group position={position} quaternion={quaternion}>
-      <lineSegments geometry={hub ? HUB_BRACKET : SITE_BRACKET}>
-        <lineBasicMaterial color={color} transparent opacity={hub ? 1 : 0.9} />
+      {active && <ActivePing reduce={reduce ?? false} />}
+      {active && (
+        <mesh>
+          <ringGeometry args={[0.05, 0.054, 48]} />
+          <meshBasicMaterial
+            color="#3fdf85"
+            transparent
+            opacity={0.5}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
+      <lineSegments geometry={bracket}>
+        <lineBasicMaterial color={color} transparent opacity={active || hub ? 1 : 0.9} />
       </lineSegments>
       <mesh>
-        <circleGeometry args={[hub ? 0.008 : 0.006, 16]} />
+        <circleGeometry args={[active ? 0.009 : hub ? 0.008 : 0.006, 16]} />
         <meshBasicMaterial color={color} side={THREE.DoubleSide} />
       </mesh>
     </group>
@@ -266,9 +347,16 @@ function SiteLabel({
   );
 }
 
-function GlobeGroup({ interacting }: { interacting: React.RefObject<boolean> }) {
+function GlobeGroup({
+  interacting,
+  activeIndex,
+}: {
+  interacting: React.RefObject<boolean>;
+  activeIndex?: number;
+}) {
   const groupRef = useRef<THREE.Group>(null);
   const occluderRef = useRef<THREE.Mesh>(null);
+  const settled = useRef(false);
   const reduce = useReducedMotion();
 
   const sitePositions = useMemo(
@@ -276,27 +364,47 @@ function GlobeGroup({ interacting }: { interacting: React.RefObject<boolean> }) 
     [],
   );
 
+  // Orientation that frames the active survey target on the front of the globe.
+  const target = useMemo(() => {
+    const s = MONITOR_SITES[activeIndex ?? 0];
+    return s ? targetQuat(s.lonLat[0], s.lonLat[1]) : null;
+  }, [activeIndex]);
+
   useFrame((_, delta) => {
-    if (reduce) return;
-    // Pause idle spin while the user is dragging so the globe doesn't slide under the cursor.
-    if (groupRef.current && !interacting.current) {
-      groupRef.current.rotation.y += delta * 0.04;
+    const g = groupRef.current;
+    // Slew to frame the active biome — snap on first paint and under reduced
+    // motion, otherwise ease in; never fight the user while they drag.
+    if (g && target) {
+      if (!settled.current || reduce) {
+        g.quaternion.copy(target);
+        settled.current = true;
+      } else if (!interacting.current) {
+        g.quaternion.slerp(target, 1 - Math.exp(-delta * 3.0));
+      }
     }
-    // The sensor sweep keeps scanning even while the user drags.
+    if (reduce) return;
+    // Both scan axes keep sweeping even while the user drags.
     const mat = occluderRef.current?.material as THREE.ShaderMaterial | undefined;
     if (mat?.uniforms?.uScan) mat.uniforms.uScan.value += delta * SCAN_SPEED;
+    if (mat?.uniforms?.uScanLat) mat.uniforms.uScanLat.value += delta * SCAN_LAT_SPEED;
   });
 
   return (
-    <group ref={groupRef} rotation={[0.22, 5.24, 0]}>
+    <group ref={groupRef}>
       <SurveySphere meshRef={occluderRef} />
       <Rim />
       {MONITOR_SITES.map((site, i) => (
-        <Marker key={site.name} position={sitePositions[i]} hub={site.hub} />
+        <Marker
+          key={site.name}
+          position={sitePositions[i]}
+          hub={site.hub}
+          active={i === activeIndex}
+          reduce={reduce}
+        />
       ))}
       {MONITOR_SITES.map(
         (site, i) =>
-          site.labeled && (
+          (site.labeled || i === activeIndex) && (
             <SiteLabel
               key={site.name}
               name={site.name}
@@ -309,7 +417,7 @@ function GlobeGroup({ interacting }: { interacting: React.RefObject<boolean> }) 
   );
 }
 
-export default function GlobeScene() {
+export default function GlobeScene({ activeIndex }: { activeIndex?: number }) {
   const interacting = useRef(false);
 
   return (
@@ -321,7 +429,7 @@ export default function GlobeScene() {
       className="!touch-pan-y"
     >
       <Suspense fallback={null}>
-        <GlobeGroup interacting={interacting} />
+        <GlobeGroup interacting={interacting} activeIndex={activeIndex} />
       </Suspense>
       <OrbitControls
         enableZoom={false}
