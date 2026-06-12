@@ -32,7 +32,7 @@ export default function OurStoryPage() {
                       {item.period}
                     </p>
                     <h2 className="mt-1.5 text-xl font-semibold text-navy-900">{item.title}</h2>
-                    <p className="mt-2.5 max-w-xl text-sm leading-6 text-navy-900/65">
+                    <p className="text-doc mt-2.5 max-w-xl text-sm leading-6 text-navy-900/65">
                       {item.body}
                     </p>
                   </Reveal>

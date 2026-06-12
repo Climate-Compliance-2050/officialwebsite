@@ -88,17 +88,28 @@ feature in a list.
 - Navy register `#0a1628`–`#16294a` = "mission control" dark sections.
 - Foreground `#0f1c2e` on `#ffffff` background.
 
-**Type:** IBM Plex Sans (`--font-sans`, body/headings) + IBM Plex Mono (`--font-mono`,
-HUD labels, coordinates, data tickers, eyebrows). Loaded via `next/font/google` in
-`layout.tsx`. No justified text (`text-justify` was deliberately removed — don't add).
+**Type:** IBM Plex Sans (`--font-sans`, body) + IBM Plex Mono (`--font-mono`, HUD
+labels, coordinates, data tickers, eyebrows) + IBM Plex Serif (`--font-serif`,
+**display voice only**: H1/H2, pull-quotes, hero caption — never body). Loaded via
+`next/font/google` in `layout.tsx`. Justified text only via the `.text-doc` utility
+(desktop-only justify + hyphens, owner-approved June 2026) on long-form left-aligned
+prose — never centered, short, or card copy; never raw `text-justify`.
 
 **Form language (the "instrument" look):**
 - Sharp corners only — radius scale is overridden to 1–3px. **No `rounded-full`** on
   pills/buttons/chips; true circles only (LIVE dots, nodes).
 - Effect utilities, reuse don't reinvent: `.grain` (dark sections), `.corners` /
-  `.corners-blue` / `.corners-faint` (reticle brackets), `.hairline-top`,
+  `.corners-blue` / `.corners-faint` (always-on reticle brackets), `.reticle` /
+  `.reticle-blue` (same brackets, fade in on hover/focus-within), `.hairline-top`,
   `.btn-sheen`, `.nav-underline`, `.tnum`.
+- Named animations in `@theme`, reuse don't redeclare: marquee, spin-slow/-slower
+  (aperture mark), orbit-a/-b + scan + core + feed + lock (Data Cube instrument),
+  twinkle (constellation nodes), scroll-cue (cinematic hero droplet).
 - The brand mark is an **aperture / lens** (slow ambient rotation).
+- **Cinematic hero pattern** (`CinematicHero.tsx`): full-bleed `min-h-[100svh]` looping
+  ambient video (muted/playsInline, assets in `public/video/`) under navy scrims for a
+  legibility floor, mono HUD telemetry frame, serif headline anchored low like a film
+  title card. Reduced motion pauses the video and shows the poster frame.
 - Respect `prefers-reduced-motion` — already wired globally; keep new animation behind
   it.
 

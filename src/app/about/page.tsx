@@ -1,6 +1,6 @@
 ﻿import type { Metadata } from "next";
 import Image from "next/image";
-import { PageHero } from "@/components/ui/PageHero";
+import { CinematicHero } from "@/components/ui/CinematicHero";
 import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -23,7 +23,10 @@ export default function AboutPage() {
   const { dataCube, techFoundation, focus } = aboutPage;
   return (
     <>
-      <PageHero {...aboutPage.hero} />
+      <CinematicHero
+        {...aboutPage.hero}
+        video={{ src: "/video/earth-orbit.mp4", poster: "/video/earth-orbit-poster.webp" }}
+      />
 
       {/* Data Cube deep-dive */}
       <section className="dark-section grain relative overflow-hidden bg-navy-950 pb-20 text-white lg:pb-28">
@@ -48,7 +51,7 @@ export default function AboutPage() {
               <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
                 {dataCube.headline}
               </h2>
-              <p className="mt-5 text-base leading-7 text-white/70">{dataCube.body}</p>
+              <p className="text-doc mt-5 text-base leading-7 text-white/70">{dataCube.body}</p>
               <ul className="mt-8 flex flex-wrap gap-2.5">
                 {dataCube.principles.map((principle) => (
                   <li

@@ -24,10 +24,10 @@ export default function ProductsPage() {
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
               {productsPage.platform.headline}
             </h2>
-            <p className="mt-6 text-base leading-7 text-navy-900/70">
+            <p className="text-doc mt-6 text-base leading-7 text-navy-900/70">
               {productsPage.platform.body}
             </p>
-            <p className="mt-4 text-base leading-7 text-navy-900/70">
+            <p className="text-doc mt-4 text-base leading-7 text-navy-900/70">
               {productsPage.platform.sandbox}
             </p>
           </Reveal>
@@ -76,7 +76,7 @@ export default function ProductsPage() {
               <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
                 {productsPage.badges.headline}
               </h2>
-              <p className="mt-5 text-base leading-7 text-navy-900/70">
+              <p className="text-doc mt-5 text-base leading-7 text-navy-900/70">
                 {productsPage.badges.body}
               </p>
               <div className="mt-8">

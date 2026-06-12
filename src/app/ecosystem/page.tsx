@@ -30,13 +30,13 @@ export default function EcosystemPage() {
               <h2 className="font-serif text-3xl font-semibold tracking-tight text-navy-900 sm:text-4xl">
                 {ecosystemPage.network.headline}
               </h2>
-              <p className="mt-6 text-base leading-7 text-navy-900/70">
+              <p className="text-doc mt-6 text-base leading-7 text-navy-900/70">
                 {ecosystemPage.network.body}
               </p>
             </Reveal>
             <Reveal delay={0.1}>
               <div className="rounded-2xl bg-slate-50 p-8 lg:mt-14">
-                <p className="text-base leading-7 text-navy-900/70">
+                <p className="text-doc text-base leading-7 text-navy-900/70">
                   {ecosystemPage.network.agnostic}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
