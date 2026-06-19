@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import {
   AnimatePresence,
@@ -22,46 +22,56 @@ import { dataCube } from "@/content/site";
  * The Data Cube — C2050's core structure, rendered as an inspectable
  * mission-control instrument that NARRATES the company's one claim:
  *
- *   take a point from the territory → bind every pillar to it →
- *   geospatial (green) ⊕ legal/regulatory (blue) lock to the coordinate
- *   → an environmental asset becomes a financial asset.
+ *   take a point from the territory → gather evidence from every pillar →
+ *   feed it into the analysis core → geospatial (green) ⊕ legal (blue)
+ *   lock to the coordinate → an environmental asset becomes a financial one.
  *
- * Top face        = the TERRITORY (coordinate grid + plotted points).
- * Front + right   = Geospatial (green) meeting Legal (blue): the bind seam.
- * Interior        = a vertical extraction axis from the territory point down
- *                   to a locked, bicolour core. On scroll-in the beats play
- *                   once, then the cube settles to a slow rock. Clicking the
- *                   core runs the layer-by-layer secure validation.
+ * The instrument autospins (continuous yaw); the viewer can grab it and
+ * fling it — the throw carries with inertia, then eases back into the spin.
+ * Each pass, every pillar face seeds a small cluster of evidence points that
+ * pop in and stream lines into the central analysis DOT. When the web
+ * completes, the core locks to the coordinate (the bind). Then it dissolves
+ * and re-gathers — a different web each pass.
  * ------------------------------------------------------------------ */
 
 const FACE = 280; // px — outer cube face
 const HALF = FACE / 2;
 const STAGE = 560; // px — instrument stage
-const REST_X = -17; // resting tilt — front/right faces read (the bind), top still visible
-const REST_Y = 36; // resting yaw — reveals Geospatial (front) ⊕ Legal (right)
-const TOP_X = -56; // territory-presenting tilt (beat 1) — looks down onto the land
-const ROCK_DEG = 7; // idle rock amplitude around REST_Y
-const DRAG_K = 0.36; // px -> deg while dragging
-const STEP_MS = 460; // per-layer validation cadence
-const LOOP_MS = 10500; // full walkthrough pass + rest hold before it replays
+const REST_X = -16; // resting tilt — front/right faces read, top still visible
+const REST_Y = 28; // starting yaw
+const SPIN = 15; // deg/s — ambient autospin (vertical axis)
+const MAX_FLING = 240; // deg/s — cap on a drag throw
+const SPIN_FRICTION = 0.85; // how fast a throw eases back toward SPIN
+const DRAG_K = 0.34; // px -> deg while dragging
 
-// Orientation that presents a pillar's face toward the camera when its row is
-// chosen from the list. Geospatial (green) and Legal (blue) resolve to the bind
-// seam (front-right) rather than square-on, so picking either keeps the
-// differentiator — geospatial meeting legal — in view.
-const PRESENT: Record<string, { x: number; y: number }> = {
-  territory: { x: TOP_X + 6, y: REST_Y }, // look down onto the land
-  geo: { x: REST_X, y: 22 }, // green front, seam to the right
-  legal: { x: REST_X, y: 52 }, // blue right, seam to the left
-  reg: { x: -12, y: 180 }, // regulatory (back) to the camera
-  sci: { x: -12, y: 90 }, // scientific (left) to the camera
-  tech: { x: 52, y: REST_Y }, // technical (underside) to the camera
-};
+const LOOP_MS = 8200; // one gather → web → dissolve pass
+const POINTS_PER = 3; // evidence points per pillar face (5 pillars → ~15)
+
+// gather/hold/fade windows as fractions of the loop
+const GATHER_START = 0.05;
+const GATHER_END = 0.46;
+const FADE_START = 0.8;
+const FADE_END = 0.97;
+const POP = 0.06; // per-point pop-in duration (fraction of loop)
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+const smooth = (t: number) => {
+  const x = clamp(t, 0, 1);
+  return x * x * (3 - 2 * x);
+};
 
-/** The story spine (always emphasised) and the bind trio (the differentiator). */
-const PRIMARY = new Set(["territory", "geo", "legal", "reg"]);
+/** Deterministic PRNG so each pass's web is reproducible from its index. */
+function mulberry32(a: number) {
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** The bind trio (the differentiator). Territory is the point, not a pillar. */
 const BIND = new Set(["geo", "legal", "reg"]);
 
 type FaceDef = {
@@ -93,10 +103,8 @@ function makeFace(
   return { key, label, index, axis, angle, accent, transform, n };
 }
 
-// 6 faces, 1:1 with dataCube.layers (same order). Faces are ordered so the
-// Geospatial (front, green) and Legal (right, blue) faces are ADJACENT — their
-// shared front-right edge is the literal "geospatial meets legal" bind seam.
-// Accent split: green = earth/territory/geo/science, blue = law/reg/technical.
+// 6 faces, 1:1 with dataCube.layers (same order). Geospatial (front, green) and
+// Legal (right, blue) are ADJACENT — their shared edge is the bind seam.
 const FACES: FaceDef[] = [
   makeFace("territory", "Territory", "01", "x", 90, "green"),
   makeFace("geo", "Geospatial", "02", "y", 0, "green"),
@@ -106,10 +114,11 @@ const FACES: FaceDef[] = [
   makeFace("tech", "Technical", "06", "x", -90, "blue"),
 ];
 
+const PILLARS = FACES.filter((f) => f.key !== "territory");
+
 const ACCENT_HEX = { green: "#65c47b", blue: "#4d9fd6" } as const;
 
-/** Diffuse shade (overlay opacity) for a face given the cube's live rotation.
- *  Kept light so the interior intersection stays readable through the glass. */
+/** Diffuse shade (overlay opacity) for a face given the cube's live rotation. */
 function faceShade(n: readonly [number, number, number], rxDeg: number, ryDeg: number) {
   const ax = (rxDeg * Math.PI) / 180;
   const ay = (ryDeg * Math.PI) / 180;
@@ -117,14 +126,12 @@ function faceShade(n: readonly [number, number, number], rxDeg: number, ryDeg: n
   const cx = Math.cos(ax);
   const sy = Math.sin(ay);
   const cy = Math.cos(ay);
-  // N = Rx(ax) * Ry(ay) * n
   const x1 = n[0] * cy + n[2] * sy;
   const y1 = n[1];
   const z1 = -n[0] * sy + n[2] * cy;
   const nx = x1;
   const ny = y1 * cx - z1 * sx;
   const nz = y1 * sx + z1 * cx;
-  // light from upper-front
   const dot = nx * 0.28 + ny * -0.32 + nz * 0.9;
   const bright = Math.max(0, dot);
   return clamp(0.42 - bright * 0.42, 0.03, 0.42);
@@ -141,10 +148,9 @@ const TERRITORY_POINTS: ReadonlyArray<readonly [number, number]> = [
   [14, 50],
 ];
 
-function TerritoryMap({ active, taken }: { active: boolean; taken: boolean }) {
+function TerritoryMap({ active }: { active: boolean }) {
   return (
     <div className={`absolute inset-0 transition-opacity duration-300 ${active ? "opacity-95" : "opacity-65"}`}>
-      {/* coordinate grid */}
       <div
         className="absolute inset-0"
         style={{
@@ -153,7 +159,6 @@ function TerritoryMap({ active, taken }: { active: boolean; taken: boolean }) {
           backgroundSize: "28px 28px",
         }}
       />
-      {/* territory boundary */}
       <svg viewBox="0 0 120 120" className="absolute inset-0 h-full w-full text-green-300" aria-hidden>
         <path
           fill="rgba(101,196,123,0.06)"
@@ -163,7 +168,6 @@ function TerritoryMap({ active, taken }: { active: boolean; taken: boolean }) {
           d="M24 22L74 14L102 38L96 78L66 104L26 92L14 54Z"
         />
       </svg>
-      {/* plotted data points */}
       {TERRITORY_POINTS.map(([x, y], i) => (
         <span
           key={i}
@@ -171,21 +175,11 @@ function TerritoryMap({ active, taken }: { active: boolean; taken: boolean }) {
           style={{ left: `${x}%`, top: `${y}%` }}
         />
       ))}
-      {/* the marked point — coordinates anchored to the extraction axis below.
-          When "taken", the ring expands and fades: the point lifts off the land. */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <span className="absolute -left-4 top-1/2 h-px w-8 -translate-y-1/2 bg-green-300/60" />
         <span className="absolute left-1/2 -top-4 h-8 w-px -translate-x-1/2 bg-green-300/60" />
-        <span
-          className={`absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border transition-all duration-500 ${
-            taken ? "scale-[2.2] border-green-200/0" : "scale-100 border-green-300/80"
-          }`}
-        />
-        <span
-          className={`absolute -left-0.5 -top-0.5 h-1 w-1 rounded-full bg-green-200 transition-all duration-300 ${
-            active || taken ? "shadow-[0_0_12px_3px_rgba(101,196,123,1)]" : "shadow-[0_0_8px_2px_rgba(101,196,123,0.9)]"
-          }`}
-        />
+        <span className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border border-green-300/80" />
+        <span className="absolute -left-0.5 -top-0.5 h-1 w-1 rounded-full bg-green-200 shadow-[0_0_10px_2px_rgba(101,196,123,0.9)]" />
       </div>
       <span className="absolute bottom-2 right-2.5 font-mono text-[10px] tracking-[0.14em] text-green-200/70">
         −3.4653 · −62.2159
@@ -201,14 +195,12 @@ function GlassFace({
   rotX,
   rotY,
   active,
-  taken,
   onActivate,
 }: {
   face: FaceDef;
   rotX: MotionValue<number>;
   rotY: MotionValue<number>;
   active: boolean;
-  taken: boolean;
   onActivate: (key: string) => void;
 }) {
   const shade = useTransform([rotX, rotY], ([rx, ry]: number[]) => faceShade(face.n, rx, ry));
@@ -229,19 +221,12 @@ function GlassFace({
       }`}
       style={{ transform: face.transform }}
     >
-      {/* glass body */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] via-transparent to-black/15" />
-      {/* directional shade */}
       <motion.div className="absolute inset-0 bg-navy-950" style={{ opacity: shadeAdj }} />
-      {/* face content — only the Territory (top) face carries detail; the data
-          discipline faces stay deliberately bare so the interior bind reads
-          clearly through the glass. */}
-      {face.key === "territory" && <TerritoryMap active={active} taken={taken} />}
-      {/* top rim light — Territory only */}
+      {face.key === "territory" && <TerritoryMap active={active} />}
       {face.key === "territory" && (
         <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/10 to-transparent" />
       )}
-      {/* index + label */}
       <span className="absolute left-3 top-2.5 font-mono text-[10px] tracking-[0.18em] text-white/55">
         {face.index}
       </span>
@@ -252,7 +237,6 @@ function GlassFace({
       >
         {face.label}
       </span>
-      {/* corner reticle tick — Territory only */}
       {face.key === "territory" && (
         <span
           className={`absolute right-2 top-2 h-2.5 w-2.5 border-r border-t transition-colors duration-300 ${
@@ -264,9 +248,8 @@ function GlassFace({
   );
 }
 
-/* --------------- interior: strata, beams, intersection --------------- */
+/* --------------- interior: strata planes --------------- */
 
-/** Translucent data-layer planes stacked beneath the territory face. */
 function Strata() {
   const planes = [
     { z: 92, tint: "rgba(101,196,123,0.30)" },
@@ -292,61 +275,28 @@ function Strata() {
   );
 }
 
-/* --------------------------- constellation --------------------------- */
+/* --------------------------- evidence web --------------------------- */
 
 type Vec3 = readonly [number, number, number];
 
-/** Territory's node sits straight up the vertical axis: its spoke IS the
- *  extraction line (the point taken from the land). The bind trio (geo/legal/
- *  reg) sit on their faces around the core; scientific/technical hang back,
- *  fainter. Depths/offsets are deterministic (no per-render jitter). */
-const NODE_DEPTH: Record<string, number> = {
-  territory: 112,
-  geo: 72,
-  legal: 72,
-  reg: 72,
-  sci: 64,
-  tech: 64,
-};
-const NODE_OFFSET: Record<string, Vec3> = {
-  territory: [0, 0, 0], // pure vertical — the extraction axis
-  geo: [10, 8, 0],
-  legal: [0, 8, 10],
-  reg: [-10, 8, 0],
-  sci: [0, -10, -8],
-  tech: [8, 0, 8],
-};
-
-/** Cross-links woven between layer nodes — the constellation web. The
- *  geo↔legal link is the bind seam and is drawn brighter. */
-const LINKS: ReadonlyArray<readonly [string, string]> = [
-  ["territory", "geo"],
-  ["territory", "legal"],
-  ["geo", "legal"],
-  ["legal", "reg"],
-  ["geo", "reg"],
-  ["reg", "sci"],
-  ["sci", "tech"],
-];
-
-function nodePos(face: FaceDef): Vec3 {
-  const d = NODE_DEPTH[face.key];
-  const o = NODE_OFFSET[face.key];
-  return [face.n[0] * d + o[0], face.n[1] * d + o[1], face.n[2] * d + o[2]];
+/** Orthonormal in-plane basis (right, up) for a face given its outward normal,
+ *  so evidence points can be scattered across the face surface in 3D. */
+function faceBasis(n: Vec3): { right: Vec3; up: Vec3 } {
+  const ref: Vec3 = Math.abs(n[1]) > 0.9 ? [0, 0, 1] : [0, 1, 0];
+  let rx = ref[1] * n[2] - ref[2] * n[1];
+  let ry = ref[2] * n[0] - ref[0] * n[2];
+  let rz = ref[0] * n[1] - ref[1] * n[0];
+  const rl = Math.hypot(rx, ry, rz) || 1;
+  rx /= rl;
+  ry /= rl;
+  rz /= rl;
+  const ux = n[1] * rz - n[2] * ry;
+  const uy = n[2] * rx - n[0] * rz;
+  const uz = n[0] * ry - n[1] * rx;
+  return { right: [rx, ry, rz], up: [ux, uy, uz] };
 }
 
-// Node positions + accent lookup are deterministic from FACES — compute once at
-// module load rather than rebuilding them on every Constellation render.
-const NODE_POSITIONS: Record<string, Vec3> = Object.fromEntries(
-  FACES.map((f) => [f.key, nodePos(f)]),
-);
-const ACCENT_BY_KEY: Record<string, "green" | "blue"> = Object.fromEntries(
-  FACES.map((f) => [f.key, f.accent]),
-);
-
-/** Transform that lays a 1px element from 3D point p0 toward p1.
- *  The element extends along its local +X from a left-center origin, so it
- *  is rotated by aligning +X onto the (p1-p0) direction via axis-angle. */
+/** Lay a 1px element from p0 toward p1 (origin at p0, extends along +X). */
 function seg(p0: Vec3, p1: Vec3) {
   const dx = p1[0] - p0[0];
   const dy = p1[1] - p0[1];
@@ -355,7 +305,6 @@ function seg(p0: Vec3, p1: Vec3) {
   const ux = dx / len;
   const uy = dy / len;
   const uz = dz / len;
-  // axis = cross((1,0,0), u) = (0, -uz, uy)
   let ax = 0;
   let ay = -uz;
   let az = uy;
@@ -363,7 +312,7 @@ function seg(p0: Vec3, p1: Vec3) {
   if (an < 1e-6) {
     ax = 0;
     ay = 0;
-    az = 1; // u parallel to X — any perpendicular axis works
+    az = 1;
   } else {
     ax /= an;
     ay /= an;
@@ -376,171 +325,74 @@ function seg(p0: Vec3, p1: Vec3) {
   };
 }
 
-/** The interior network: faint web between layer nodes, plus a primary spoke
- *  from each node into the locked intersection, fed by a particle travelling
- *  node → centre. The territory spoke is the extraction axis; the bind trio
- *  (geo/legal/reg) carry the differentiator and stay brighter. */
-function Constellation({
-  validatingKey,
-  bindPhase,
-  extractPhase,
-  bound,
-}: {
-  validatingKey: string | null;
-  bindPhase: boolean;
-  extractPhase: boolean;
-  bound: boolean;
-}) {
-  const center: Vec3 = [0, 0, 0];
-  const positions = NODE_POSITIONS;
+type WebPoint = {
+  faceKey: string;
+  accent: "green" | "blue";
+  pos: Vec3;
+  lineLen: number;
+  lineTransform: string;
+  tPop: number; // fraction of loop at which this point pops in
+};
 
-  const isHot = (key: string) =>
-    validatingKey === key ||
-    (bindPhase && BIND.has(key)) ||
-    (extractPhase && key === "territory");
-
-  return (
-    <div
-      className="absolute left-1/2 top-1/2"
-      style={{ width: 0, height: 0, transformStyle: "preserve-3d" }}
-    >
-      {/* constellation web */}
-      {LINKS.map(([a, b], i) => {
-        const { len, transform } = seg(positions[a], positions[b]);
-        const c = ACCENT_HEX[ACCENT_BY_KEY[a]];
-        const seam = (a === "geo" && b === "legal") || (a === "legal" && b === "geo");
-        const hot = isHot(a) || isHot(b);
-        const op = hot ? 0.9 : seam ? (bound ? 0.7 : 0.5) : 0.26;
-        return (
-          <div
-            key={`web-${i}`}
-            className="absolute transition-opacity duration-300"
-            style={{
-              left: 0,
-              top: -0.5,
-              width: len,
-              height: seam ? 1.5 : 1,
-              transformOrigin: "0 50%",
-              transform,
-              background: seam
-                ? "linear-gradient(90deg, #65c47b00, #65c47b80, #4d9fd680, #4d9fd600)"
-                : `linear-gradient(90deg, ${c}00, ${c}59, ${c}00)`,
-              opacity: op,
-            }}
-          />
-        );
-      })}
-
-      {/* primary spokes + feed particles + layer nodes */}
-      {FACES.map((face, i) => {
-        const c = ACCENT_HEX[face.accent];
-        const hot = isHot(face.key);
-        const primary = PRIMARY.has(face.key);
-        const p = positions[face.key];
-        const { len, transform } = seg(center, p); // centre → node
-        const op = hot ? 1 : primary ? (bound ? 0.7 : 0.5) : 0.28;
-        return (
-          <div key={face.key} className="absolute" style={{ transformStyle: "preserve-3d" }}>
-            {/* spoke */}
-            <div
-              className="absolute transition-all duration-200"
-              style={{
-                left: 0,
-                top: hot ? -1 : -0.5,
-                width: len,
-                height: hot ? 2 : 1,
-                transformOrigin: "0 50%",
-                transform,
-                background: `linear-gradient(90deg, ${c}d9, ${c}14)`,
-                boxShadow: hot ? `0 0 10px 1px ${c}` : undefined,
-                opacity: op,
-              }}
-            />
-            {/* feed particle: travels node → centre along the spoke */}
-            <div
-              className="absolute"
-              style={{ left: 0, top: 0, transformOrigin: "0 50%", transform, transformStyle: "preserve-3d" }}
-            >
-              <span
-                className="animate-feed motion-reduce:hidden absolute h-1.5 w-1.5 rounded-full"
-                style={
-                  {
-                    left: -3,
-                    top: -3,
-                    background: c,
-                    boxShadow: `0 0 8px 2px ${c}`,
-                    animationDelay: `${i * 0.4}s`,
-                    animationDuration: hot ? "1.1s" : undefined,
-                    "--beam-len": `${len}px`,
-                  } as CSSProperties
-                }
-              />
-            </div>
-            {/* layer node */}
-            <div
-              className="absolute"
-              style={{ transform: `translate3d(${p[0]}px,${p[1]}px,${p[2]}px)`, transformStyle: "preserve-3d" }}
-            >
-              <span
-                className="animate-twinkle motion-reduce:animate-none absolute rounded-full"
-                style={{
-                  left: -2.5,
-                  top: -2.5,
-                  width: 5,
-                  height: 5,
-                  background: c,
-                  boxShadow: `0 0 8px 2px ${c}`,
-                  animationDelay: `${i * 0.5}s`,
-                  opacity: hot ? 1 : primary ? 0.85 : 0.5,
-                }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+/** Build a pass's web: each pillar seeds POINTS_PER points scattered on its
+ *  face, each with a line back to the core and a staggered pop time. */
+function genWeb(cycle: number): WebPoint[] {
+  const rand = mulberry32((0x9e3779b1 ^ (cycle * 0x6d2b79f5)) >>> 0);
+  const out: WebPoint[] = [];
+  const total = PILLARS.length * POINTS_PER;
+  PILLARS.forEach((face, k) => {
+    const { right, up } = faceBasis(face.n);
+    for (let j = 0; j < POINTS_PER; j++) {
+      const idx = k * POINTS_PER + j;
+      const u = (rand() * 2 - 1) * HALF * 0.6;
+      const v = (rand() * 2 - 1) * HALF * 0.6;
+      const s = HALF * 0.94; // sit just under the glass
+      const pos: Vec3 = [
+        face.n[0] * s + right[0] * u + up[0] * v,
+        face.n[1] * s + right[1] * u + up[1] * v,
+        face.n[2] * s + right[2] * u + up[2] * v,
+      ];
+      const { len, transform } = seg([0, 0, 0], pos); // core → point
+      const tPop =
+        GATHER_START + (idx / total) * (GATHER_END - GATHER_START) + (rand() - 0.5) * 0.018;
+      out.push({ faceKey: face.key, accent: face.accent, pos, lineLen: len, lineTransform: transform, tPop });
+    }
+  });
+  return out;
 }
 
-/* ------------------------ validation sequence ------------------------ */
+/** A point's presence (0..1) at a given loop phase: pops in at tPop, holds,
+ *  then every point fades together at FADE_START so the full web reads at once. */
+function presence(phase: number, tPop: number) {
+  if (phase < tPop) return 0;
+  if (phase < tPop + POP) return smooth((phase - tPop) / POP);
+  if (phase < FADE_START) return 1;
+  if (phase < FADE_END) return 1 - smooth((phase - FADE_START) / (FADE_END - FADE_START));
+  return 0;
+}
 
-type VStatus = "idle" | "running" | "done";
-type VRow = { hash: string; time: string };
-
-/* ----------------------- narrative beat machine ---------------------- */
-// Plays once when the section scrolls into view, then settles to "rest".
-type Phase = "pre" | "territory" | "extract" | "bind" | "lock" | "rest";
+/** Core intensity over the loop: dim, ramps up as evidence arrives, holds at
+ *  the locked peak, then settles back as the web dissolves. */
+function coreLevel(phase: number) {
+  if (phase < GATHER_START) return 0.22;
+  if (phase < GATHER_END) return 0.22 + 0.78 * smooth((phase - GATHER_START) / (GATHER_END - GATHER_START));
+  if (phase < FADE_START) return 1;
+  if (phase < FADE_END) return 0.22 + 0.78 * (1 - smooth((phase - FADE_START) / (FADE_END - FADE_START)));
+  return 0.22;
+}
 
 /* ------------------------------ orbiter ------------------------------ */
 
-function Orbit({
-  size,
-  tilt,
-  color,
-  spin,
-}: {
-  size: number;
-  tilt: number;
-  color: string;
-  spin: string;
-}) {
+function Orbit({ size, tilt, color, spin }: { size: number; tilt: number; color: string; spin: string }) {
   return (
     <div
       className="pointer-events-none absolute inset-0 m-auto"
       style={{ width: 0, height: 0, transformStyle: "preserve-3d", transform: `rotateX(${tilt}deg)` }}
     >
-      {/* orbit path */}
       <div
         className="absolute rounded-full border"
-        style={{
-          width: size,
-          height: size,
-          left: -size / 2,
-          top: -size / 2,
-          borderColor: `${color}1f`,
-        }}
+        style={{ width: size, height: size, left: -size / 2, top: -size / 2, borderColor: `${color}1f` }}
       />
-      {/* spinning node carrier */}
       <div className={`absolute left-0 top-0 ${spin}`}>
         <div
           className="absolute"
@@ -555,12 +407,7 @@ function Orbit({
         />
         <div
           className="absolute h-2 w-2 rounded-full"
-          style={{
-            left: size / 2 - 4,
-            top: -4,
-            background: color,
-            boxShadow: `0 0 12px 2px ${color}`,
-          }}
+          style={{ left: size / 2 - 4, top: -4, background: color, boxShadow: `0 0 12px 2px ${color}` }}
         />
       </div>
     </div>
@@ -569,12 +416,15 @@ function Orbit({
 
 /* ------------------------------ section ------------------------------ */
 
+type WebStage = "idle" | "collecting" | "bound";
+
 export function DataCubeTeaser() {
   const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { margin: "-20% 0px -20% 0px" });
   const [activeFace, setActiveFace] = useState<string | null>(null);
+  const [pinned, setPinned] = useState<string | null>(null);
 
   const rotateX = useMotionValue(REST_X);
   const rotateY = useMotionValue(REST_Y);
@@ -582,220 +432,146 @@ export function DataCubeTeaser() {
   const tiltY = useSpring(0, { stiffness: 80, damping: 18 });
   const shadowScale = useTransform(rotateY, (ry) => 0.78 + 0.22 * Math.abs(Math.cos((ry * Math.PI) / 180)));
 
-  // rAF-driven orientation: lerp toward target; at rest, slow rock.
-  const target = useRef({ x: REST_X, y: REST_Y, rock: false });
-  const ui = useRef({ dragging: false, hovering: false, px: 0, py: 0, moved: 0 });
+  const [playing, setPlaying] = useState(true);
+  const [cycle, setCycle] = useState(0);
+  const [stage, setStage] = useState<WebStage>("collecting");
+  const bound = stage === "bound";
 
-  /* ---- narrative beats ---- */
-  const [phase, setPhase] = useState<Phase>("pre");
-  const [bound, setBound] = useState(false); // core locked + payoff shown
-  const [playing, setPlaying] = useState(true); // auto-walkthrough loop on/off
-  const [pinned, setPinned] = useState<string | null>(null); // pillar picked from the list
-  const nTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const resumeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const web = useMemo(() => genWeb(cycle), [cycle]);
+
+  // refs the rAF loop writes to directly (bypasses React render churn)
+  const pointRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const lineRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const coreGlowRef = useRef<HTMLDivElement | null>(null);
+  const webRef = useRef<WebPoint[]>(web);
+
+  // pointer / spin state
+  const ui = useRef({ dragging: false, hovering: false, px: 0, py: 0, vx: SPIN, tPrev: 0 });
+  const yawVel = useRef(SPIN);
+  const elapsed = useRef(0); // ms into the current pass
+  const lastNow = useRef(0); // wall-clock timestamp of the previous frame
+  const stageRefVal = useRef<WebStage>("collecting");
   const playingRef = useRef(true);
   const inViewRef = useRef(false);
-  const clearNarrative = useCallback(() => {
-    nTimers.current.forEach(clearTimeout);
-    nTimers.current = [];
-  }, []);
-  const clearResume = useCallback(() => {
-    if (resumeRef.current) clearTimeout(resumeRef.current);
-    resumeRef.current = null;
-  }, []);
-  const suspend = useCallback(() => {
-    clearNarrative();
-    clearResume();
-  }, [clearNarrative, clearResume]);
+  const activeRef = useRef<string | null>(null);
 
-  /* ---- secure point validation ---- */
-  const [vStatus, setVStatus] = useState<VStatus>("idle");
-  const [vStep, setVStep] = useState(0); // layers completed
-  const [vRows, setVRows] = useState<VRow[]>([]);
-  const vTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const stopTimer = () => {
-    if (vTimer.current) clearInterval(vTimer.current);
-    vTimer.current = null;
-  };
-  const vStatusRef = useRef<VStatus>("idle");
-
-  // clear every pending timer on unmount
-  useEffect(
-    () => () => {
-      if (vTimer.current) clearInterval(vTimer.current);
-      nTimers.current.forEach(clearTimeout);
-      if (resumeRef.current) clearTimeout(resumeRef.current);
-    },
-    [],
-  );
-
-  // keep the refs the loop reads from in sync with state
-  useEffect(() => { playingRef.current = playing; }, [playing]);
-  useEffect(() => { inViewRef.current = inView; }, [inView]);
-  useEffect(() => { vStatusRef.current = vStatus; }, [vStatus]);
-
-  /* One walkthrough pass: territory → extract → bind → lock → rest, then it
-     replays. The story itself is unchanged; it now loops instead of stopping,
-     and only while the section is in view, playing, and not mid-validation.
-     The replay is dispatched through a ref so the pass can re-arm itself. */
-  const runPassRef = useRef<() => void>(() => {});
-  const runPass = useCallback(() => {
-    clearNarrative();
-    const at = (ms: number, fn: () => void) => nTimers.current.push(setTimeout(fn, ms));
-    target.current = { x: TOP_X, y: REST_Y, rock: false };
-    at(0, () => {
-      setPinned(null);
-      setBound(false);
-      setPhase("territory");
-      setActiveFace("territory");
-    });
-    at(1100, () => {
-      target.current = { x: REST_X, y: REST_Y, rock: false };
-      setPhase("extract");
-      setActiveFace(null);
-    });
-    at(2300, () => setPhase("bind"));
-    at(4500, () => {
-      setPhase("lock");
-      setBound(true);
-    });
-    at(5600, () => {
-      target.current = { x: REST_X, y: REST_Y, rock: true };
-      setPhase("rest");
-    });
-    at(LOOP_MS, () => {
-      if (playingRef.current && inViewRef.current && vStatusRef.current === "idle") runPassRef.current();
-    });
-  }, [clearNarrative]);
   useEffect(() => {
-    runPassRef.current = runPass;
-  }, [runPass]);
+    playingRef.current = playing;
+  }, [playing]);
+  useEffect(() => {
+    inViewRef.current = inView;
+  }, [inView]);
+  useEffect(() => {
+    activeRef.current = activeFace;
+  }, [activeFace]);
+  useEffect(() => {
+    webRef.current = web;
+  }, [web]);
 
-  // resume the walkthrough a beat after an interaction settles
-  const resumeSoon = useCallback(
-    (delay: number) => {
-      clearResume();
-      resumeRef.current = setTimeout(() => {
-        if (playingRef.current && inViewRef.current && vStatusRef.current === "idle") runPass();
-      }, delay);
-    },
-    [clearResume, runPass],
-  );
+  const setStageSafe = useCallback((s: WebStage) => {
+    if (stageRefVal.current !== s) {
+      stageRefVal.current = s;
+      setStage(s);
+    }
+  }, []);
 
-  // rotate the cube to present a chosen pillar; pause the loop, then resume
-  const presentFace = useCallback(
-    (key: string) => {
-      const p = PRESENT[key];
-      if (!p) return;
-      suspend();
-      setActiveFace(key);
-      setPinned(key);
-      if (BIND.has(key)) setBound(true); // geo/legal/reg carry the bind chrome
-      if (reduce) {
-        rotateX.set(p.x);
-        rotateY.set(p.y);
-      } else {
-        target.current = { x: p.x, y: p.y, rock: false };
-        resumeSoon(6500); // hold the pillar, then resume the walkthrough
+  // Reduced motion: render the completed web, locked core, no animation.
+  useEffect(() => {
+    if (!reduce) return;
+    rotateX.set(REST_X);
+    rotateY.set(REST_Y);
+    web.forEach((_, i) => {
+      const n = pointRefs.current[i];
+      if (n) {
+        n.style.opacity = "1";
+        n.style.transform = "scale(1)";
       }
-    },
-    [reduce, suspend, resumeSoon, rotateX, rotateY],
-  );
+      const l = lineRefs.current[i];
+      if (l) l.style.opacity = "0.5";
+    });
+    if (coreGlowRef.current) {
+      coreGlowRef.current.style.opacity = "1";
+      coreGlowRef.current.style.transform = "scale(1.1)";
+    }
+    setStageSafe("bound");
+  }, [reduce, web, rotateX, rotateY, setStageSafe]);
+
+  useAnimationFrame(() => {
+    if (reduce || !inViewRef.current) {
+      lastNow.current = 0;
+      return;
+    }
+    // real wall-clock delta — frame-rate independent (framer clamps its own
+    // delta; rAF can be throttled, e.g. in headless capture)
+    const now = performance.now();
+    const real = lastNow.current ? now - lastNow.current : 16;
+    lastNow.current = now;
+    const dt = Math.min(0.05, real / 1000);
+    const s = ui.current;
+
+    /* ---- rotation: autospin + inertial throw ---- */
+    if (!s.dragging) {
+      // ease the fling velocity back toward the ambient spin
+      yawVel.current += (SPIN - yawVel.current) * Math.min(1, dt * SPIN_FRICTION);
+      rotateY.set(rotateY.get() + yawVel.current * dt);
+      // settle tilt back to the readable rest angle
+      const rx = rotateX.get();
+      rotateX.set(rx + (REST_X - rx) * Math.min(1, dt * 1.6));
+    }
+
+    if (!playingRef.current) return;
+
+    /* ---- gather → web → dissolve clock ---- */
+    elapsed.current += real;
+    if (elapsed.current >= LOOP_MS) {
+      elapsed.current -= LOOP_MS;
+      setCycle((c) => c + 1); // regenerate the web for the next pass
+    }
+    const phase = elapsed.current / LOOP_MS;
+
+    const pts = webRef.current;
+    const act = activeRef.current;
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      const pr = presence(phase, p.tPop);
+      const hot = act === p.faceKey;
+      const node = pointRefs.current[i];
+      if (node) {
+        node.style.opacity = `${pr}`;
+        node.style.transform = `scale(${0.3 + 0.7 * pr})`;
+      }
+      const line = lineRefs.current[i];
+      if (line) line.style.opacity = `${pr * (hot ? 0.85 : 0.5)}`;
+    }
+    if (coreGlowRef.current) {
+      const lvl = coreLevel(phase);
+      coreGlowRef.current.style.opacity = `${0.3 + 0.7 * lvl}`;
+      coreGlowRef.current.style.transform = `scale(${0.85 + 0.3 * lvl})`;
+    }
+
+    setStageSafe(phase > 0.52 && phase < FADE_START ? "bound" : "collecting");
+  });
 
   const togglePlay = useCallback(() => setPlaying((p) => !p), []);
 
-  /* Drive the loop. Reduced motion jumps straight to the told end-state
-     (locked core + payoff) with no animation. Otherwise it runs while the
-     section is in view and playing, and stops when either goes false. */
-  useEffect(() => {
-    if (reduce) {
-      if (!inView) return;
-      const t = setTimeout(() => {
-        target.current = { x: REST_X, y: REST_Y, rock: false };
-        setBound(true);
-        setPhase("rest");
-      }, 0);
-      return () => clearTimeout(t);
-    }
-    if (inView && playing) {
-      runPass();
-      return suspend;
-    }
-    suspend();
-  }, [inView, playing, reduce, runPass, suspend]);
-
-  const startValidation = () => {
-    if (ui.current.moved > 8) return; // it was a drag, not a click
-    if (vStatus === "running") return;
-    suspend(); // the secure run takes over from the ambient beats
-    target.current = { x: REST_X, y: REST_Y, rock: true };
-    setPhase("rest");
-    setBound(true);
-    stopTimer();
-    const time = new Date().toLocaleTimeString("en-GB", { hour12: false });
-    setVRows(
-      FACES.map(() => ({
-        hash: `#${Math.random().toString(16).slice(2, 6)}`,
-        time,
-      })),
-    );
-    setVStep(0);
-    setVStatus("running");
-    setActiveFace(FACES[0].key);
-    vTimer.current = setInterval(() => {
-      setVStep((s) => {
-        const next = s + 1;
-        if (next >= FACES.length) {
-          stopTimer();
-          setVStatus("done");
-          setActiveFace(null);
-        } else {
-          setActiveFace(FACES[next].key);
-        }
-        return next;
-      });
-    }, STEP_MS);
-  };
-
-  const closeValidation = () => {
-    stopTimer();
-    setVStatus("idle");
-    setVStep(0);
-    setActiveFace(null);
-    if (!reduce) resumeSoon(800); // hand back to the walkthrough
-  };
-
-  useAnimationFrame((t, delta) => {
-    // Skip while reduced-motion or scrolled out of view — the idle rock keeps
-    // mutating rotateY otherwise, recomputing every face shade off-screen forever.
-    if (reduce || !inViewRef.current) return;
-    const s = ui.current;
-    if (s.dragging) return;
-    const dt = Math.min(0.05, delta / 1000);
-    const rx = rotateX.get();
-    rotateX.set(rx + (target.current.x - rx) * Math.min(1, dt * 1.6));
-    const ry = rotateY.get();
-    const goalY =
-      target.current.rock && !s.hovering ? REST_Y + Math.sin(t / 2600) * ROCK_DEG : target.current.y;
-    rotateY.set(ry + (goalY - ry) * Math.min(1, dt * 1.4));
-  });
-
+  /* ---- drag to rotate, release to fling ---- */
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     const s = ui.current;
     s.dragging = true;
-    s.moved = 0;
     s.px = e.clientX;
     s.py = e.clientY;
-    suspend(); // a grab interrupts the ambient beats
-    target.current.rock = true;
+    s.vx = 0;
+    s.tPrev = performance.now();
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
 
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
-    ui.current.dragging = false;
-    target.current = { x: REST_X, y: REST_Y, rock: true }; // settle back so labels stay legible
-    if (!reduce) resumeSoon(2600); // pick the walkthrough back up after a drag
+    const s = ui.current;
+    if (s.dragging) {
+      // hand the cube's momentum to the autospin loop
+      yawVel.current = clamp(s.vx || SPIN, -MAX_FLING, MAX_FLING);
+    }
+    s.dragging = false;
     e.currentTarget.releasePointerCapture?.(e.pointerId);
   };
 
@@ -804,11 +580,14 @@ export function DataCubeTeaser() {
     if (s.dragging) {
       const dx = e.clientX - s.px;
       const dy = e.clientY - s.py;
-      s.moved += Math.abs(dx) + Math.abs(dy);
       rotateY.set(rotateY.get() + dx * DRAG_K);
       rotateX.set(clamp(rotateX.get() - dy * DRAG_K, -82, 82));
+      const now = performance.now();
+      const dtm = (now - s.tPrev) / 1000;
+      if (dtm > 0) s.vx = 0.6 * s.vx + 0.4 * ((dx * DRAG_K) / dtm); // smoothed deg/s
       s.px = e.clientX;
       s.py = e.clientY;
+      s.tPrev = now;
       return;
     }
     if (reduce) return;
@@ -826,35 +605,24 @@ export function DataCubeTeaser() {
 
   const onPointerLeave = () => {
     const s = ui.current;
+    if (s.dragging) yawVel.current = clamp(s.vx || SPIN, -MAX_FLING, MAX_FLING);
     s.hovering = false;
     s.dragging = false;
-    if (vStatus !== "running") setActiveFace(null);
+    setActiveFace(pinned);
     tiltX.set(0);
     tiltY.set(0);
   };
 
-  const validatingKey = vStatus === "running" && vStep < FACES.length ? FACES[vStep].key : null;
-  const bindPhase = phase === "bind" || phase === "lock";
-  const extractPhase = phase === "extract" || phase === "bind";
-  const territoryTaken = phase === "extract" || phase === "bind" || phase === "lock";
+  const pickFace = (key: string) => {
+    setPinned((cur) => (cur === key ? null : key));
+    setActiveFace(key);
+  };
 
-  // bottom-left telemetry line — narrates the live beat (validation overrides)
-  const statusLine =
-    vStatus === "running"
-      ? "validating layers…"
-      : vStatus === "done"
-        ? "point validated"
-        : phase === "territory"
-          ? "point selected · −3.4653 −62.2159"
-          : phase === "extract"
-            ? "extracting point from territory…"
-            : phase === "bind"
-              ? "binding pillars · geo ⊕ legal"
-              : phase === "lock"
-                ? "asset → financial asset"
-                : bound
-                  ? "drag to rotate · tap core to re-run"
-                  : "drag to rotate · tap the core";
+  const statusLine = !playing
+    ? "paused"
+    : bound
+      ? "web bound · geospatial ⊕ legal · locked to coordinate"
+      : "collecting layer evidence → analysis core…";
 
   return (
     <section
@@ -868,7 +636,7 @@ export function DataCubeTeaser() {
           <div className="relative order-2 flex items-center justify-center lg:order-1">
             <div
               ref={stageRef}
-              className="corners corners-faint relative -my-24 grid scale-[0.58] place-items-center sm:-my-12 sm:scale-75 lg:my-0 lg:scale-100"
+              className="corners corners-faint relative -my-24 grid scale-[0.58] cursor-grab place-items-center active:cursor-grabbing sm:-my-12 sm:scale-75 lg:my-0 lg:scale-100"
               style={{ width: STAGE, height: STAGE, perspective: 1400, touchAction: "pan-y" }}
               onPointerEnter={onPointerEnter}
               onPointerLeave={onPointerLeave}
@@ -905,7 +673,7 @@ export function DataCubeTeaser() {
 
                 {/* spinning cube */}
                 <motion.div
-                  className="relative cursor-grab active:cursor-grabbing"
+                  className="relative"
                   style={{
                     width: FACE,
                     height: FACE,
@@ -914,21 +682,88 @@ export function DataCubeTeaser() {
                     transformStyle: "preserve-3d",
                   }}
                 >
-                  {/* interior first so the glass renders over it */}
                   <Strata />
-                  <Constellation
-                    validatingKey={validatingKey}
-                    bindPhase={bindPhase}
-                    extractPhase={extractPhase}
-                    bound={bound}
-                  />
 
-                  {/* the bind core — where geospatial (green) meets legal (blue)
-                      and locks to the coordinate. Bicolour ring appears on lock.
-                      The 2D lock reticle + tag are drawn as billboards below. */}
-                  <div className="animate-core absolute inset-0 m-auto h-24 w-24 rounded-full bg-green-500/30 blur-2xl" />
+                  {/* evidence web — points scattered on each pillar face, each
+                      streaming a line into the analysis core. */}
+                  <div
+                    className="absolute left-1/2 top-1/2"
+                    style={{ width: 0, height: 0, transformStyle: "preserve-3d" }}
+                  >
+                    {web.map((p, i) => {
+                      const c = ACCENT_HEX[p.accent];
+                      return (
+                        <div key={i} className="absolute" style={{ transformStyle: "preserve-3d" }}>
+                          {/* line: core → point */}
+                          <div
+                            ref={(el) => {
+                              lineRefs.current[i] = el;
+                            }}
+                            className="absolute"
+                            style={{
+                              left: 0,
+                              top: -0.5,
+                              width: p.lineLen,
+                              height: 1,
+                              transformOrigin: "0 50%",
+                              transform: p.lineTransform,
+                              background: `linear-gradient(90deg, ${c}26, ${c}73, ${c}00)`,
+                              opacity: 0,
+                            }}
+                          >
+                            {/* feed particle streams point → core */}
+                            <span
+                              className="animate-feed motion-reduce:hidden absolute h-1 w-1 rounded-full"
+                              style={
+                                {
+                                  left: -2,
+                                  top: -2,
+                                  background: c,
+                                  boxShadow: `0 0 6px 1px ${c}`,
+                                  animationDelay: `${(i % POINTS_PER) * 0.35 + (i % 5) * 0.12}s`,
+                                  "--beam-len": `${p.lineLen}px`,
+                                } as CSSProperties
+                              }
+                            />
+                          </div>
+                          {/* evidence point on the face */}
+                          <div
+                            className="absolute"
+                            style={{
+                              transform: `translate3d(${p.pos[0]}px,${p.pos[1]}px,${p.pos[2]}px)`,
+                              transformStyle: "preserve-3d",
+                            }}
+                          >
+                            <span
+                              ref={(el) => {
+                                pointRefs.current[i] = el;
+                              }}
+                              className="absolute rounded-full"
+                              style={{
+                                left: -2.5,
+                                top: -2.5,
+                                width: 5,
+                                height: 5,
+                                background: c,
+                                boxShadow: `0 0 7px 2px ${c}`,
+                                opacity: 0,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* the analysis core — where the evidence locks to the
+                      coordinate (geospatial green ⊕ legal blue). */}
+                  <div
+                    ref={coreGlowRef}
+                    className="absolute inset-0 m-auto h-24 w-24 rounded-full bg-green-500/30 blur-2xl"
+                    style={{ opacity: 0.3 }}
+                  />
                   <div className="absolute inset-0 m-auto h-11 w-11 rounded-full bg-blue-500/30 blur-lg" />
-                  {/* bicolour lock ring — slow spin once bound */}
+                  {/* bicolour lock ring — appears once the web is bound */}
                   <div
                     className={`animate-lock motion-reduce:animate-none absolute inset-0 m-auto h-9 w-9 rounded-full transition-opacity duration-500 ${
                       bound ? "opacity-90" : "opacity-0"
@@ -949,6 +784,7 @@ export function DataCubeTeaser() {
                         : "0 0 22px 6px rgba(101,196,123,0.75)",
                     }}
                   />
+
                   {FACES.map((face) => (
                     <GlassFace
                       key={face.key}
@@ -956,7 +792,6 @@ export function DataCubeTeaser() {
                       rotX={rotateX}
                       rotY={rotateY}
                       active={activeFace === face.key}
-                      taken={face.key === "territory" && territoryTaken}
                       onActivate={setActiveFace}
                     />
                   ))}
@@ -974,8 +809,7 @@ export function DataCubeTeaser() {
                 </div>
               </motion.div>
 
-              {/* lock-on reticle (2D — cube centre always projects to stage
-                  centre, so this billboard stays crisp and viewer-facing) */}
+              {/* lock-on reticle (2D billboard, always viewer-facing) */}
               <div
                 aria-hidden
                 className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
@@ -1013,27 +847,6 @@ export function DataCubeTeaser() {
                 )}
               </AnimatePresence>
 
-              {/* intersection hit target (2D — cube centre always projects here) */}
-              <button
-                type="button"
-                onClick={startValidation}
-                onPointerDown={(e) => {
-                  // keep the stage from capturing the pointer — capture retargets
-                  // the click away from this button
-                  e.stopPropagation();
-                  ui.current.moved = 0;
-                }}
-                aria-label="Validate the intersection point across all data layers"
-                className="peer absolute left-1/2 top-1/2 z-20 h-14 w-14 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-green-400/70"
-              />
-              {/* hover/focus hint so the core reads as a control */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 translate-y-[40px] whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-white/0 transition-colors duration-300 peer-hover:text-white/60 peer-focus-visible:text-white/70"
-              >
-                {dataCube.hud.validateHint}
-              </span>
-
               {/* telemetry HUD */}
               <div
                 aria-hidden
@@ -1055,8 +868,7 @@ export function DataCubeTeaser() {
                 </div>
               </div>
 
-              {/* payoff plaque — the outcome of the bind: environmental → financial.
-                  Sits low, billboard-style, appears once the core locks. */}
+              {/* payoff plaque — the outcome of the bind: environmental → financial */}
               <AnimatePresence>
                 {bound && (
                   <motion.div
@@ -1076,85 +888,6 @@ export function DataCubeTeaser() {
                 )}
               </AnimatePresence>
             </div>
-
-            {/* point-validation HUD panel (outside the scaled stage so it stays readable) */}
-            <AnimatePresence>
-              {vStatus !== "idle" && (
-                <motion.div
-                  role="status"
-                  aria-live="polite"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 8 }}
-                  transition={{ duration: 0.22 }}
-                  className="absolute right-0 top-2 z-30 w-[268px] border border-green-400/40 bg-navy-950/90 font-mono text-[10px] uppercase tracking-[0.12em] backdrop-blur-md sm:right-2 sm:top-6"
-                >
-                    <div className="flex items-center justify-between border-b border-white/10 px-3 py-2">
-                      <span className="text-green-300/90">Point validation · 7F3A·22</span>
-                      <button
-                        type="button"
-                        onClick={closeValidation}
-                        aria-label="Close validation panel"
-                        className="cursor-pointer px-1 text-white/50 transition-colors hover:text-white"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <ul className="px-3 py-2">
-                      {FACES.map((face, i) => {
-                        const ok = i < vStep || vStatus === "done";
-                        const busy = vStatus === "running" && i === vStep;
-                        const green = face.accent === "green";
-                        return (
-                          <li key={face.key} className="flex items-center gap-2 py-[3px]">
-                            <span
-                              className={
-                                ok
-                                  ? green
-                                    ? "text-green-300"
-                                    : "text-blue-200"
-                                  : busy
-                                    ? "animate-pulse text-white/80"
-                                    : "text-white/40"
-                              }
-                            >
-                              {ok ? "✓" : busy ? "⟳" : "·"}
-                            </span>
-                            <span className={ok || busy ? "flex-1 text-white/85" : "flex-1 text-white/50"}>
-                              {face.label}
-                            </span>
-                            {ok ? (
-                              <>
-                                <span className={green ? "text-green-300/70" : "text-blue-200/70"}>
-                                  {vRows[i]?.hash}
-                                </span>
-                                <span className="tnum text-white/50">{vRows[i]?.time}</span>
-                              </>
-                            ) : (
-                              <span className="text-white/45">{busy ? "validating…" : "queued"}</span>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    <div
-                      className={`flex items-center gap-1.5 border-t px-3 py-2 ${
-                        vStatus === "done"
-                          ? "border-green-400/30 text-green-300"
-                          : "border-white/10 text-white/55"
-                      }`}
-                    >
-                      {vStatus === "done" ? (
-                        <span>{dataCube.hud.validated}</span>
-                      ) : (
-                        <span className="tnum">
-                          Secure · {vStep}/{FACES.length} layers
-                        </span>
-                      )}
-                    </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
 
           {/* ---------------- Copy + interactive layers ---------------- */}
@@ -1200,11 +933,11 @@ export function DataCubeTeaser() {
                       role="button"
                       tabIndex={0}
                       aria-pressed={pinned === face.key}
-                      onClick={() => presentFace(face.key)}
+                      onClick={() => pickFace(face.key)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          presentFace(face.key);
+                          pickFace(face.key);
                         }
                       }}
                       onMouseEnter={() => setActiveFace(face.key)}
