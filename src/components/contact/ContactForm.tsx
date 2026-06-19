@@ -9,7 +9,7 @@ import { contactPage } from "@/content/about";
  * Formspree URL), submits via fetch; otherwise falls back to a prefilled
  * mailto draft. Swap in the real endpoint once hosting is decided.
  */
-const FORM_ENDPOINT = "";
+const FORM_ENDPOINT = "https://formspree.io/f/mqeovoqa";
 const CONTACT_EMAIL = "contact@c2050.com";
 
 type Status = "idle" | "sending" | "sent" | "error";
