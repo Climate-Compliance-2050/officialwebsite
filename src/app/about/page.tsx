@@ -5,6 +5,7 @@ import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
+import { MissionVision } from "@/components/home/MissionVision";
 import { aboutPage } from "@/content/about";
 
 export const metadata: Metadata = {
@@ -27,6 +28,8 @@ export default function AboutPage() {
         {...aboutPage.hero}
         video={{ src: "/video/earth-orbit.mp4", poster: "/video/earth-orbit-poster.webp" }}
       />
+
+      <MissionVision />
 
       {/* Data Cube deep-dive */}
       <section className="dark-section grain relative overflow-hidden bg-navy-950 pb-20 text-white lg:pb-28">
@@ -152,7 +155,7 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-green-300/80">
-                  live
+                  scene
                 </span>
               </div>
 
@@ -186,7 +189,7 @@ export default function AboutPage() {
                   className="pointer-events-none absolute inset-0 font-mono text-[10px] uppercase tracking-[0.18em] text-white/55"
                 >
                   <div className="absolute left-4 top-3 leading-relaxed">
-                    <div className="text-green-300/80">SCENE · LIVE</div>
+                    <div className="text-green-300/80">SCENE · EO</div>
                     <div>ASSET 7F3A·22</div>
                   </div>
                   <div className="absolute right-4 top-3 text-right leading-relaxed">

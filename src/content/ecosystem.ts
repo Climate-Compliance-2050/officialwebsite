@@ -42,7 +42,7 @@ export const productsPage = {
     sandbox:
       "Whether you originate, manage or retire carbon credits, the platform's sandbox environment supports evidence-based integrity assessment of any underlying nature-based project: regulatory compliance, legal rights and scientific credibility in one view.",
     modules: [
-      { id: "geo", name: "Geospatial module", short: "Geospatial", body: "Boundary verification, overlap detection, land-use dynamics and advanced geoprocessing.", icon: "geographical" as BrandIconName, core: true },
+      { id: "geo", name: "Geospatial module", short: "Geospatial", body: "Boundary verification, overlap with protected and tenure layers, land-use dynamics and advanced geoprocessing.", icon: "geographical" as BrandIconName, core: true },
       { id: "legal", name: "Legal module", short: "Legal", body: "Land tenure, carbon rights and contractual chains mapped to applicable law.", icon: "legal-regulatory" as BrandIconName, core: true },
       { id: "regulatory", name: "Regulatory module", short: "Regulatory", body: "Article 6, CORSIA, national frameworks and registry rules, monitored as they evolve.", icon: "jurisdictional" as BrandIconName, core: true },
       { id: "scientific", name: "Scientific module", short: "Scientific", body: "Carbon-stock models, baselines and emission-reduction metrics benchmarked against standards.", icon: "co2" as BrandIconName },
@@ -77,21 +77,20 @@ export const productsPage = {
     quote: "Prices depend on scope and seats. Every tier is quoted directly — no list pricing.",
   },
   /**
-   * Shared DNA — the four intelligence layers present in every licence, bound to
-   * coordinates by the Data Cube. This is what does NOT change between tiers; tiers
-   * differ only in what you can do and who they suit (see `tiers`). Notes are drawn
-   * from the module bodies above — no new claims.
+   * Shared DNA — the bind (geospatial ⊕ legal ⊕ regulatory, locked to the
+   * coordinate) present in every licence. This is what does NOT change between
+   * tiers; scientific, technical and compliance depth unlocks upward (see `tiers`).
+   * Notes are drawn from the module bodies above — no new claims.
    */
   dna: {
     eyebrow: "In every licence",
-    aside: "Four layers · all tiers",
+    aside: "The bind · all tiers",
     pillars: [
+      { label: "Geospatial", note: "Footprint, terrain, land-use and boundaries — the geospatial fact." },
       { label: "Legal", note: "Land tenure, carbon rights, contractual chains, applicable law." },
       { label: "Regulatory", note: "Article 6, CORSIA, national frameworks and registry rules." },
-      { label: "Scientific", note: "Carbon-stock models, baselines and emission-reduction metrics." },
-      { label: "Compliance", note: "Audit trails, evidence packages and Smart Compliance Badges." },
     ],
-    bind: "Every record carries the same bind: legal and regulatory status locked to geospatial coordinates through the Data Cube. Competitors do geospatial or legal — C2050 holds both as one record.",
+    bind: "Every record carries the same bind: legal and regulatory status locked to geospatial coordinates through the Data Cube. Competitors do geospatial or legal — C2050 holds both as one record. Scientific, technical and compliance depth unlocks by tier.",
   },
   /**
    * Tiers. The DNA above is identical across all four — these differ only in what the

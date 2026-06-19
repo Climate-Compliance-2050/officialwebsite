@@ -60,7 +60,7 @@ export function CinematicHero({ eyebrow, headline, body, video }: CinematicHeroP
         <div className="leading-relaxed">
           <div className="flex items-center gap-1.5 text-green-300/80">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400" />
-            orbital feed · live
+            orbital feed
           </div>
           <div>C2050 · Earth observation</div>
         </div>

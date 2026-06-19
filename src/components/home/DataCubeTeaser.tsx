@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import {
   AnimatePresence,
   motion,
   useAnimationFrame,
+  useInView,
   useMotionValue,
   useReducedMotion,
   useSpring,
@@ -19,26 +20,49 @@ import { dataCube } from "@/content/site";
 
 /* ------------------------------------------------------------------ *
  * The Data Cube — C2050's core structure, rendered as an inspectable
- * mission-control instrument.
+ * mission-control instrument that NARRATES the company's one claim:
+ *
+ *   take a point from the territory → bind every pillar to it →
+ *   geospatial (green) ⊕ legal/regulatory (blue) lock to the coordinate
+ *   → an environmental asset becomes a financial asset.
  *
  * Top face        = the TERRITORY (coordinate grid + plotted points).
- * Side faces      = Geospatial · Scientific · Legal · Regulatory.
- * Bottom face     = Technical.
- * Inside the glass: data beams feed from every face and intersect at
- * one glowing node — the validated point of value. Clicking the node
- * runs a layer-by-layer secure validation in a HUD panel.
+ * Front + right   = Geospatial (green) meeting Legal (blue): the bind seam.
+ * Interior        = a vertical extraction axis from the territory point down
+ *                   to a locked, bicolour core. On scroll-in the beats play
+ *                   once, then the cube settles to a slow rock. Clicking the
+ *                   core runs the layer-by-layer secure validation.
  * ------------------------------------------------------------------ */
 
 const FACE = 280; // px — outer cube face
 const HALF = FACE / 2;
 const STAGE = 560; // px — instrument stage
-const REST_X = -26; // resting tilt (shows the territory top face)
-const REST_Y = -32;
-const AUTO_SPIN = 12; // deg/s ambient rotation
+const REST_X = -17; // resting tilt — front/right faces read (the bind), top still visible
+const REST_Y = 36; // resting yaw — reveals Geospatial (front) ⊕ Legal (right)
+const TOP_X = -56; // territory-presenting tilt (beat 1) — looks down onto the land
+const ROCK_DEG = 7; // idle rock amplitude around REST_Y
 const DRAG_K = 0.36; // px -> deg while dragging
 const STEP_MS = 460; // per-layer validation cadence
+const LOOP_MS = 10500; // full walkthrough pass + rest hold before it replays
+
+// Orientation that presents a pillar's face toward the camera when its row is
+// chosen from the list. Geospatial (green) and Legal (blue) resolve to the bind
+// seam (front-right) rather than square-on, so picking either keeps the
+// differentiator — geospatial meeting legal — in view.
+const PRESENT: Record<string, { x: number; y: number }> = {
+  territory: { x: TOP_X + 6, y: REST_Y }, // look down onto the land
+  geo: { x: REST_X, y: 22 }, // green front, seam to the right
+  legal: { x: REST_X, y: 52 }, // blue right, seam to the left
+  reg: { x: -12, y: 180 }, // regulatory (back) to the camera
+  sci: { x: -12, y: 90 }, // scientific (left) to the camera
+  tech: { x: 52, y: REST_Y }, // technical (underside) to the camera
+};
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+
+/** The story spine (always emphasised) and the bind trio (the differentiator). */
+const PRIMARY = new Set(["territory", "geo", "legal", "reg"]);
+const BIND = new Set(["geo", "legal", "reg"]);
 
 type FaceDef = {
   key: string;
@@ -69,14 +93,16 @@ function makeFace(
   return { key, label, index, axis, angle, accent, transform, n };
 }
 
-// 6 faces, 1:1 with dataCube.layers (same order): territory on top,
-// the four data disciplines around the sides, technical underneath.
+// 6 faces, 1:1 with dataCube.layers (same order). Faces are ordered so the
+// Geospatial (front, green) and Legal (right, blue) faces are ADJACENT — their
+// shared front-right edge is the literal "geospatial meets legal" bind seam.
+// Accent split: green = earth/territory/geo/science, blue = law/reg/technical.
 const FACES: FaceDef[] = [
   makeFace("territory", "Territory", "01", "x", 90, "green"),
   makeFace("geo", "Geospatial", "02", "y", 0, "green"),
-  makeFace("sci", "Scientific", "03", "y", 90, "blue"),
-  makeFace("legal", "Legal", "04", "y", 180, "green"),
-  makeFace("reg", "Regulatory", "05", "y", 270, "blue"),
+  makeFace("legal", "Legal", "03", "y", 90, "blue"),
+  makeFace("reg", "Regulatory", "04", "y", 180, "blue"),
+  makeFace("sci", "Scientific", "05", "y", 270, "green"),
   makeFace("tech", "Technical", "06", "x", -90, "blue"),
 ];
 
@@ -115,7 +141,7 @@ const TERRITORY_POINTS: ReadonlyArray<readonly [number, number]> = [
   [14, 50],
 ];
 
-function TerritoryMap({ active }: { active: boolean }) {
+function TerritoryMap({ active, taken }: { active: boolean; taken: boolean }) {
   return (
     <div className={`absolute inset-0 transition-opacity duration-300 ${active ? "opacity-95" : "opacity-65"}`}>
       {/* coordinate grid */}
@@ -145,12 +171,21 @@ function TerritoryMap({ active }: { active: boolean }) {
           style={{ left: `${x}%`, top: `${y}%` }}
         />
       ))}
-      {/* the marked point — coordinates anchored to the intersection below */}
+      {/* the marked point — coordinates anchored to the extraction axis below.
+          When "taken", the ring expands and fades: the point lifts off the land. */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <span className="absolute -left-4 top-1/2 h-px w-8 -translate-y-1/2 bg-green-300/60" />
         <span className="absolute left-1/2 -top-4 h-8 w-px -translate-x-1/2 bg-green-300/60" />
-        <span className="absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border border-green-300/80" />
-        <span className="absolute -left-0.5 -top-0.5 h-1 w-1 rounded-full bg-green-200 shadow-[0_0_8px_2px_rgba(101,196,123,0.9)]" />
+        <span
+          className={`absolute -left-1.5 -top-1.5 h-3 w-3 rounded-full border transition-all duration-500 ${
+            taken ? "scale-[2.2] border-green-200/0" : "scale-100 border-green-300/80"
+          }`}
+        />
+        <span
+          className={`absolute -left-0.5 -top-0.5 h-1 w-1 rounded-full bg-green-200 transition-all duration-300 ${
+            active || taken ? "shadow-[0_0_12px_3px_rgba(101,196,123,1)]" : "shadow-[0_0_8px_2px_rgba(101,196,123,0.9)]"
+          }`}
+        />
       </div>
       <span className="absolute bottom-2 right-2.5 font-mono text-[10px] tracking-[0.14em] text-green-200/70">
         −3.4653 · −62.2159
@@ -166,12 +201,14 @@ function GlassFace({
   rotX,
   rotY,
   active,
+  taken,
   onActivate,
 }: {
   face: FaceDef;
   rotX: MotionValue<number>;
   rotY: MotionValue<number>;
   active: boolean;
+  taken: boolean;
   onActivate: (key: string) => void;
 }) {
   const shade = useTransform([rotX, rotY], ([rx, ry]: number[]) => faceShade(face.n, rx, ry));
@@ -196,10 +233,10 @@ function GlassFace({
       <div className="absolute inset-0 bg-gradient-to-br from-white/[0.05] via-transparent to-black/15" />
       {/* directional shade */}
       <motion.div className="absolute inset-0 bg-navy-950" style={{ opacity: shadeAdj }} />
-      {/* face content — only the Territory (top) face carries detail;
-          the data discipline faces stay deliberately bare so the interior
-          constellation reads clearly through the glass. */}
-      {face.key === "territory" && <TerritoryMap active={active} />}
+      {/* face content — only the Territory (top) face carries detail; the data
+          discipline faces stay deliberately bare so the interior bind reads
+          clearly through the glass. */}
+      {face.key === "territory" && <TerritoryMap active={active} taken={taken} />}
       {/* top rim light — Territory only */}
       {face.key === "territory" && (
         <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/10 to-transparent" />
@@ -259,35 +296,37 @@ function Strata() {
 
 type Vec3 = readonly [number, number, number];
 
-/** Each layer's data node lives inside the glass, pushed off its face's
- *  normal axis so the network reads as an irregular constellation rather
- *  than a symmetric set of radial spokes. Depths/offsets are deterministic
- *  (no per-render jitter). */
+/** Territory's node sits straight up the vertical axis: its spoke IS the
+ *  extraction line (the point taken from the land). The bind trio (geo/legal/
+ *  reg) sit on their faces around the core; scientific/technical hang back,
+ *  fainter. Depths/offsets are deterministic (no per-render jitter). */
 const NODE_DEPTH: Record<string, number> = {
-  territory: 96,
-  geo: 78,
-  sci: 88,
-  legal: 70,
-  reg: 82,
-  tech: 92,
+  territory: 112,
+  geo: 72,
+  legal: 72,
+  reg: 72,
+  sci: 64,
+  tech: 64,
 };
 const NODE_OFFSET: Record<string, Vec3> = {
-  territory: [16, 0, -20],
-  geo: [-24, 20, 0],
-  sci: [0, -22, 16],
-  legal: [22, -16, 0],
-  reg: [0, 24, -14],
-  tech: [-16, 0, 22],
+  territory: [0, 0, 0], // pure vertical — the extraction axis
+  geo: [10, 8, 0],
+  legal: [0, 8, 10],
+  reg: [-10, 8, 0],
+  sci: [0, -10, -8],
+  tech: [8, 0, 8],
 };
 
-/** Faint cross-links woven between layer nodes — the constellation web. */
+/** Cross-links woven between layer nodes — the constellation web. The
+ *  geo↔legal link is the bind seam and is drawn brighter. */
 const LINKS: ReadonlyArray<readonly [string, string]> = [
   ["territory", "geo"],
-  ["territory", "sci"],
+  ["territory", "legal"],
+  ["geo", "legal"],
+  ["legal", "reg"],
   ["geo", "reg"],
-  ["sci", "legal"],
-  ["legal", "tech"],
-  ["reg", "tech"],
+  ["reg", "sci"],
+  ["sci", "tech"],
 ];
 
 function nodePos(face: FaceDef): Vec3 {
@@ -295,6 +334,15 @@ function nodePos(face: FaceDef): Vec3 {
   const o = NODE_OFFSET[face.key];
   return [face.n[0] * d + o[0], face.n[1] * d + o[1], face.n[2] * d + o[2]];
 }
+
+// Node positions + accent lookup are deterministic from FACES — compute once at
+// module load rather than rebuilding them on every Constellation render.
+const NODE_POSITIONS: Record<string, Vec3> = Object.fromEntries(
+  FACES.map((f) => [f.key, nodePos(f)]),
+);
+const ACCENT_BY_KEY: Record<string, "green" | "blue"> = Object.fromEntries(
+  FACES.map((f) => [f.key, f.accent]),
+);
 
 /** Transform that lays a 1px element from 3D point p0 toward p1.
  *  The element extends along its local +X from a left-center origin, so it
@@ -328,13 +376,28 @@ function seg(p0: Vec3, p1: Vec3) {
   };
 }
 
-/** The interior network: faint web between layer nodes, plus a primary
- *  spoke from each node into the highlighted intersection, fed by a
- *  particle travelling node → centre. */
-function Constellation({ validatingKey }: { validatingKey: string | null }) {
+/** The interior network: faint web between layer nodes, plus a primary spoke
+ *  from each node into the locked intersection, fed by a particle travelling
+ *  node → centre. The territory spoke is the extraction axis; the bind trio
+ *  (geo/legal/reg) carry the differentiator and stay brighter. */
+function Constellation({
+  validatingKey,
+  bindPhase,
+  extractPhase,
+  bound,
+}: {
+  validatingKey: string | null;
+  bindPhase: boolean;
+  extractPhase: boolean;
+  bound: boolean;
+}) {
   const center: Vec3 = [0, 0, 0];
-  const positions: Record<string, Vec3> = {};
-  for (const f of FACES) positions[f.key] = nodePos(f);
+  const positions = NODE_POSITIONS;
+
+  const isHot = (key: string) =>
+    validatingKey === key ||
+    (bindPhase && BIND.has(key)) ||
+    (extractPhase && key === "territory");
 
   return (
     <div
@@ -344,8 +407,10 @@ function Constellation({ validatingKey }: { validatingKey: string | null }) {
       {/* constellation web */}
       {LINKS.map(([a, b], i) => {
         const { len, transform } = seg(positions[a], positions[b]);
-        const c = ACCENT_HEX[FACES.find((f) => f.key === a)!.accent];
-        const hot = validatingKey === a || validatingKey === b;
+        const c = ACCENT_HEX[ACCENT_BY_KEY[a]];
+        const seam = (a === "geo" && b === "legal") || (a === "legal" && b === "geo");
+        const hot = isHot(a) || isHot(b);
+        const op = hot ? 0.9 : seam ? (bound ? 0.7 : 0.5) : 0.26;
         return (
           <div
             key={`web-${i}`}
@@ -354,11 +419,13 @@ function Constellation({ validatingKey }: { validatingKey: string | null }) {
               left: 0,
               top: -0.5,
               width: len,
-              height: 1,
+              height: seam ? 1.5 : 1,
               transformOrigin: "0 50%",
               transform,
-              background: `linear-gradient(90deg, ${c}00, ${c}59, ${c}00)`,
-              opacity: hot ? 0.85 : 0.3,
+              background: seam
+                ? "linear-gradient(90deg, #65c47b00, #65c47b80, #4d9fd680, #4d9fd600)"
+                : `linear-gradient(90deg, ${c}00, ${c}59, ${c}00)`,
+              opacity: op,
             }}
           />
         );
@@ -367,14 +434,16 @@ function Constellation({ validatingKey }: { validatingKey: string | null }) {
       {/* primary spokes + feed particles + layer nodes */}
       {FACES.map((face, i) => {
         const c = ACCENT_HEX[face.accent];
-        const hot = validatingKey === face.key;
+        const hot = isHot(face.key);
+        const primary = PRIMARY.has(face.key);
         const p = positions[face.key];
         const { len, transform } = seg(center, p); // centre → node
+        const op = hot ? 1 : primary ? (bound ? 0.7 : 0.5) : 0.28;
         return (
           <div key={face.key} className="absolute" style={{ transformStyle: "preserve-3d" }}>
             {/* spoke */}
             <div
-              className="absolute transition-opacity duration-200"
+              className="absolute transition-all duration-200"
               style={{
                 left: 0,
                 top: hot ? -1 : -0.5,
@@ -384,7 +453,7 @@ function Constellation({ validatingKey }: { validatingKey: string | null }) {
                 transform,
                 background: `linear-gradient(90deg, ${c}d9, ${c}14)`,
                 boxShadow: hot ? `0 0 10px 1px ${c}` : undefined,
-                opacity: hot ? 1 : 0.42,
+                opacity: op,
               }}
             />
             {/* feed particle: travels node → centre along the spoke */}
@@ -422,7 +491,7 @@ function Constellation({ validatingKey }: { validatingKey: string | null }) {
                   background: c,
                   boxShadow: `0 0 8px 2px ${c}`,
                   animationDelay: `${i * 0.5}s`,
-                  opacity: hot ? 1 : 0.85,
+                  opacity: hot ? 1 : primary ? 0.85 : 0.5,
                 }}
               />
             </div>
@@ -437,6 +506,10 @@ function Constellation({ validatingKey }: { validatingKey: string | null }) {
 
 type VStatus = "idle" | "running" | "done";
 type VRow = { hash: string; time: string };
+
+/* ----------------------- narrative beat machine ---------------------- */
+// Plays once when the section scrolls into view, then settles to "rest".
+type Phase = "pre" | "territory" | "extract" | "bind" | "lock" | "rest";
 
 /* ------------------------------ orbiter ------------------------------ */
 
@@ -498,7 +571,9 @@ function Orbit({
 
 export function DataCubeTeaser() {
   const reduce = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(sectionRef, { margin: "-20% 0px -20% 0px" });
   const [activeFace, setActiveFace] = useState<string | null>(null);
 
   const rotateX = useMotionValue(REST_X);
@@ -507,7 +582,31 @@ export function DataCubeTeaser() {
   const tiltY = useSpring(0, { stiffness: 80, damping: 18 });
   const shadowScale = useTransform(rotateY, (ry) => 0.78 + 0.22 * Math.abs(Math.cos((ry * Math.PI) / 180)));
 
-  const ui = useRef({ dragging: false, hovering: false, spinVel: AUTO_SPIN, px: 0, py: 0, moved: 0 });
+  // rAF-driven orientation: lerp toward target; at rest, slow rock.
+  const target = useRef({ x: REST_X, y: REST_Y, rock: false });
+  const ui = useRef({ dragging: false, hovering: false, px: 0, py: 0, moved: 0 });
+
+  /* ---- narrative beats ---- */
+  const [phase, setPhase] = useState<Phase>("pre");
+  const [bound, setBound] = useState(false); // core locked + payoff shown
+  const [playing, setPlaying] = useState(true); // auto-walkthrough loop on/off
+  const [pinned, setPinned] = useState<string | null>(null); // pillar picked from the list
+  const nTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const resumeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const playingRef = useRef(true);
+  const inViewRef = useRef(false);
+  const clearNarrative = useCallback(() => {
+    nTimers.current.forEach(clearTimeout);
+    nTimers.current = [];
+  }, []);
+  const clearResume = useCallback(() => {
+    if (resumeRef.current) clearTimeout(resumeRef.current);
+    resumeRef.current = null;
+  }, []);
+  const suspend = useCallback(() => {
+    clearNarrative();
+    clearResume();
+  }, [clearNarrative, clearResume]);
 
   /* ---- secure point validation ---- */
   const [vStatus, setVStatus] = useState<VStatus>("idle");
@@ -519,11 +618,120 @@ export function DataCubeTeaser() {
     if (vTimer.current) clearInterval(vTimer.current);
     vTimer.current = null;
   };
-  useEffect(() => stopTimer, []);
+  const vStatusRef = useRef<VStatus>("idle");
+
+  // clear every pending timer on unmount
+  useEffect(
+    () => () => {
+      if (vTimer.current) clearInterval(vTimer.current);
+      nTimers.current.forEach(clearTimeout);
+      if (resumeRef.current) clearTimeout(resumeRef.current);
+    },
+    [],
+  );
+
+  // keep the refs the loop reads from in sync with state
+  useEffect(() => { playingRef.current = playing; }, [playing]);
+  useEffect(() => { inViewRef.current = inView; }, [inView]);
+  useEffect(() => { vStatusRef.current = vStatus; }, [vStatus]);
+
+  /* One walkthrough pass: territory → extract → bind → lock → rest, then it
+     replays. The story itself is unchanged; it now loops instead of stopping,
+     and only while the section is in view, playing, and not mid-validation.
+     The replay is dispatched through a ref so the pass can re-arm itself. */
+  const runPassRef = useRef<() => void>(() => {});
+  const runPass = useCallback(() => {
+    clearNarrative();
+    const at = (ms: number, fn: () => void) => nTimers.current.push(setTimeout(fn, ms));
+    target.current = { x: TOP_X, y: REST_Y, rock: false };
+    at(0, () => {
+      setPinned(null);
+      setBound(false);
+      setPhase("territory");
+      setActiveFace("territory");
+    });
+    at(1100, () => {
+      target.current = { x: REST_X, y: REST_Y, rock: false };
+      setPhase("extract");
+      setActiveFace(null);
+    });
+    at(2300, () => setPhase("bind"));
+    at(4500, () => {
+      setPhase("lock");
+      setBound(true);
+    });
+    at(5600, () => {
+      target.current = { x: REST_X, y: REST_Y, rock: true };
+      setPhase("rest");
+    });
+    at(LOOP_MS, () => {
+      if (playingRef.current && inViewRef.current && vStatusRef.current === "idle") runPassRef.current();
+    });
+  }, [clearNarrative]);
+  useEffect(() => {
+    runPassRef.current = runPass;
+  }, [runPass]);
+
+  // resume the walkthrough a beat after an interaction settles
+  const resumeSoon = useCallback(
+    (delay: number) => {
+      clearResume();
+      resumeRef.current = setTimeout(() => {
+        if (playingRef.current && inViewRef.current && vStatusRef.current === "idle") runPass();
+      }, delay);
+    },
+    [clearResume, runPass],
+  );
+
+  // rotate the cube to present a chosen pillar; pause the loop, then resume
+  const presentFace = useCallback(
+    (key: string) => {
+      const p = PRESENT[key];
+      if (!p) return;
+      suspend();
+      setActiveFace(key);
+      setPinned(key);
+      if (BIND.has(key)) setBound(true); // geo/legal/reg carry the bind chrome
+      if (reduce) {
+        rotateX.set(p.x);
+        rotateY.set(p.y);
+      } else {
+        target.current = { x: p.x, y: p.y, rock: false };
+        resumeSoon(6500); // hold the pillar, then resume the walkthrough
+      }
+    },
+    [reduce, suspend, resumeSoon, rotateX, rotateY],
+  );
+
+  const togglePlay = useCallback(() => setPlaying((p) => !p), []);
+
+  /* Drive the loop. Reduced motion jumps straight to the told end-state
+     (locked core + payoff) with no animation. Otherwise it runs while the
+     section is in view and playing, and stops when either goes false. */
+  useEffect(() => {
+    if (reduce) {
+      if (!inView) return;
+      const t = setTimeout(() => {
+        target.current = { x: REST_X, y: REST_Y, rock: false };
+        setBound(true);
+        setPhase("rest");
+      }, 0);
+      return () => clearTimeout(t);
+    }
+    if (inView && playing) {
+      runPass();
+      return suspend;
+    }
+    suspend();
+  }, [inView, playing, reduce, runPass, suspend]);
 
   const startValidation = () => {
     if (ui.current.moved > 8) return; // it was a drag, not a click
     if (vStatus === "running") return;
+    suspend(); // the secure run takes over from the ambient beats
+    target.current = { x: REST_X, y: REST_Y, rock: true };
+    setPhase("rest");
+    setBound(true);
     stopTimer();
     const time = new Date().toLocaleTimeString("en-GB", { hour12: false });
     setVRows(
@@ -555,19 +763,22 @@ export function DataCubeTeaser() {
     setVStatus("idle");
     setVStep(0);
     setActiveFace(null);
+    if (!reduce) resumeSoon(800); // hand back to the walkthrough
   };
 
-  useAnimationFrame((_, delta) => {
-    if (reduce) return;
+  useAnimationFrame((t, delta) => {
+    // Skip while reduced-motion or scrolled out of view — the idle rock keeps
+    // mutating rotateY otherwise, recomputing every face shade off-screen forever.
+    if (reduce || !inViewRef.current) return;
     const s = ui.current;
     if (s.dragging) return;
     const dt = Math.min(0.05, delta / 1000);
-    if (!s.hovering) {
-      rotateY.set(rotateY.get() + s.spinVel * dt);
-      s.spinVel += (AUTO_SPIN - s.spinVel) * Math.min(1, dt * 0.8);
-    }
     const rx = rotateX.get();
-    rotateX.set(rx + (REST_X - rx) * Math.min(1, dt * 1.4));
+    rotateX.set(rx + (target.current.x - rx) * Math.min(1, dt * 1.6));
+    const ry = rotateY.get();
+    const goalY =
+      target.current.rock && !s.hovering ? REST_Y + Math.sin(t / 2600) * ROCK_DEG : target.current.y;
+    rotateY.set(ry + (goalY - ry) * Math.min(1, dt * 1.4));
   });
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
@@ -576,11 +787,15 @@ export function DataCubeTeaser() {
     s.moved = 0;
     s.px = e.clientX;
     s.py = e.clientY;
+    suspend(); // a grab interrupts the ambient beats
+    target.current.rock = true;
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
 
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     ui.current.dragging = false;
+    target.current = { x: REST_X, y: REST_Y, rock: true }; // settle back so labels stay legible
+    if (!reduce) resumeSoon(2600); // pick the walkthrough back up after a drag
     e.currentTarget.releasePointerCapture?.(e.pointerId);
   };
 
@@ -592,7 +807,6 @@ export function DataCubeTeaser() {
       s.moved += Math.abs(dx) + Math.abs(dy);
       rotateY.set(rotateY.get() + dx * DRAG_K);
       rotateX.set(clamp(rotateX.get() - dy * DRAG_K, -82, 82));
-      s.spinVel = clamp(dx * DRAG_K * 60, -260, 260); // carry fling into auto-resume
       s.px = e.clientX;
       s.py = e.clientY;
       return;
@@ -620,9 +834,33 @@ export function DataCubeTeaser() {
   };
 
   const validatingKey = vStatus === "running" && vStep < FACES.length ? FACES[vStep].key : null;
+  const bindPhase = phase === "bind" || phase === "lock";
+  const extractPhase = phase === "extract" || phase === "bind";
+  const territoryTaken = phase === "extract" || phase === "bind" || phase === "lock";
+
+  // bottom-left telemetry line — narrates the live beat (validation overrides)
+  const statusLine =
+    vStatus === "running"
+      ? "validating layers…"
+      : vStatus === "done"
+        ? "point validated"
+        : phase === "territory"
+          ? "point selected · −3.4653 −62.2159"
+          : phase === "extract"
+            ? "extracting point from territory…"
+            : phase === "bind"
+              ? "binding pillars · geo ⊕ legal"
+              : phase === "lock"
+                ? "asset → financial asset"
+                : bound
+                  ? "drag to rotate · tap core to re-run"
+                  : "drag to rotate · tap the core";
 
   return (
-    <section className="dark-section grain hairline-top relative overflow-hidden bg-navy-900 py-20 text-white lg:py-28">
+    <section
+      ref={sectionRef}
+      className="dark-section grain hairline-top relative overflow-hidden bg-navy-900 py-20 text-white lg:py-28"
+    >
       <SurveyBackdrop ticks={false} />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-14 lg:grid-cols-2">
@@ -678,17 +916,38 @@ export function DataCubeTeaser() {
                 >
                   {/* interior first so the glass renders over it */}
                   <Strata />
-                  <Constellation validatingKey={validatingKey} />
+                  <Constellation
+                    validatingKey={validatingKey}
+                    bindPhase={bindPhase}
+                    extractPhase={extractPhase}
+                    bound={bound}
+                  />
 
-                  {/* the intersection node — the highlighted validated point.
-                      Layered halo + core dot. The lock-on reticle is drawn
-                      as a 2D overlay below (always faces the viewer). */}
+                  {/* the bind core — where geospatial (green) meets legal (blue)
+                      and locks to the coordinate. Bicolour ring appears on lock.
+                      The 2D lock reticle + tag are drawn as billboards below. */}
                   <div className="animate-core absolute inset-0 m-auto h-24 w-24 rounded-full bg-green-500/30 blur-2xl" />
-                  <div className="absolute inset-0 m-auto h-11 w-11 rounded-full bg-green-300/35 blur-lg" />
+                  <div className="absolute inset-0 m-auto h-11 w-11 rounded-full bg-blue-500/30 blur-lg" />
+                  {/* bicolour lock ring — slow spin once bound */}
                   <div
-                    className={`absolute inset-0 m-auto h-4 w-4 rounded-full transition-colors duration-300 ${
-                      vStatus === "done" ? "bg-green-100" : "bg-green-200"
-                    } shadow-[0_0_28px_8px_rgba(101,196,123,0.9)]`}
+                    className={`animate-lock motion-reduce:animate-none absolute inset-0 m-auto h-9 w-9 rounded-full transition-opacity duration-500 ${
+                      bound ? "opacity-90" : "opacity-0"
+                    }`}
+                    style={{
+                      background: "conic-gradient(from 0deg, #65c47b, #4d9fd6, #65c47b)",
+                      WebkitMask: "radial-gradient(closest-side, transparent 64%, #000 66%)",
+                      mask: "radial-gradient(closest-side, transparent 64%, #000 66%)",
+                    }}
+                  />
+                  <div
+                    className={`absolute inset-0 m-auto h-4 w-4 rounded-full transition-all duration-300 ${
+                      bound ? "bg-white" : "bg-green-200"
+                    }`}
+                    style={{
+                      boxShadow: bound
+                        ? "0 0 26px 7px rgba(101,196,123,0.85), 0 0 18px 5px rgba(77,159,214,0.7)"
+                        : "0 0 22px 6px rgba(101,196,123,0.75)",
+                    }}
                   />
                   {FACES.map((face) => (
                     <GlassFace
@@ -697,6 +956,7 @@ export function DataCubeTeaser() {
                       rotX={rotateX}
                       rotY={rotateY}
                       active={activeFace === face.key}
+                      taken={face.key === "territory" && territoryTaken}
                       onActivate={setActiveFace}
                     />
                   ))}
@@ -722,13 +982,36 @@ export function DataCubeTeaser() {
               >
                 <div className="relative h-28 w-28">
                   <span className="animate-lock motion-reduce:animate-none absolute inset-0 rounded-full border border-dashed border-green-300/35" />
-                  <span className="absolute inset-[14px] rounded-full border border-green-300/15" />
+                  <span
+                    className={`absolute inset-[14px] rounded-full border transition-colors duration-500 ${
+                      bound ? "border-blue-300/40" : "border-green-300/15"
+                    }`}
+                  />
                   <span className="absolute left-1/2 top-0 h-4 w-px -translate-x-1/2 bg-gradient-to-b from-green-300/80 to-transparent" />
-                  <span className="absolute bottom-0 left-1/2 h-4 w-px -translate-x-1/2 bg-gradient-to-t from-green-300/80 to-transparent" />
+                  <span className="absolute bottom-0 left-1/2 h-4 w-px -translate-x-1/2 bg-gradient-to-t from-blue-300/80 to-transparent" />
                   <span className="absolute left-0 top-1/2 h-px w-4 -translate-y-1/2 bg-gradient-to-r from-green-300/80 to-transparent" />
-                  <span className="absolute right-0 top-1/2 h-px w-4 -translate-y-1/2 bg-gradient-to-l from-green-300/80 to-transparent" />
+                  <span className="absolute right-0 top-1/2 h-px w-4 -translate-y-1/2 bg-gradient-to-l from-blue-300/80 to-transparent" />
                 </div>
               </div>
+
+              {/* bind tag (2D billboard) — names the differentiator at the core */}
+              <AnimatePresence>
+                {bound && (
+                  <motion.div
+                    aria-hidden
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 translate-y-[64px] whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.16em]"
+                  >
+                    <span className="text-green-300">Geospatial</span>
+                    <span className="px-1 text-white/70">⊕</span>
+                    <span className="text-blue-200">Legal</span>
+                    <span className="ml-1.5 text-white/45">· locked to coordinate</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* intersection hit target (2D — cube centre always projects here) */}
               <button
@@ -741,8 +1024,15 @@ export function DataCubeTeaser() {
                   ui.current.moved = 0;
                 }}
                 aria-label="Validate the intersection point across all data layers"
-                className="absolute left-1/2 top-1/2 z-20 h-14 w-14 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-green-400/70"
+                className="peer absolute left-1/2 top-1/2 z-20 h-14 w-14 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-green-400/70"
               />
+              {/* hover/focus hint so the core reads as a control */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 translate-y-[40px] whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-white/0 transition-colors duration-300 peer-hover:text-white/60 peer-focus-visible:text-white/70"
+              >
+                {dataCube.hud.validateHint}
+              </span>
 
               {/* telemetry HUD */}
               <div
@@ -758,19 +1048,33 @@ export function DataCubeTeaser() {
                   <div>LON −62.2159</div>
                 </div>
                 <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
-                  <span>
-                    {vStatus === "running"
-                      ? "validating layers…"
-                      : vStatus === "done"
-                        ? "point validated"
-                        : "tap the core · validate point"}
-                  </span>
+                  <span>{statusLine}</span>
                 </div>
                 <div className="absolute bottom-3 right-3 text-right">
-                  <span className="tnum">6 layers · 1 point</span>
+                  <span className="tnum">5 pillars · 1 point</span>
                 </div>
               </div>
 
+              {/* payoff plaque — the outcome of the bind: environmental → financial.
+                  Sits low, billboard-style, appears once the core locks. */}
+              <AnimatePresence>
+                {bound && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 6 }}
+                    transition={{ duration: 0.45, delay: 0.1 }}
+                    className="pointer-events-none absolute bottom-12 left-1/2 z-10 -translate-x-1/2"
+                  >
+                    <div className="flex items-center gap-2.5 border border-white/15 bg-navy-950/70 px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.14em] backdrop-blur-sm">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400" />
+                      <span className="text-white/70">{dataCube.hud.payoff.from}</span>
+                      <span className="text-white/40">→</span>
+                      <span className="font-semibold text-white">{dataCube.hud.payoff.to}</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* point-validation HUD panel (outside the scaled stage so it stays readable) */}
@@ -841,7 +1145,7 @@ export function DataCubeTeaser() {
                       }`}
                     >
                       {vStatus === "done" ? (
-                        <span>Point validated · decision-grade</span>
+                        <span>{dataCube.hud.validated}</span>
                       ) : (
                         <span className="tnum">
                           Secure · {vStep}/{FACES.length} layers
@@ -866,26 +1170,54 @@ export function DataCubeTeaser() {
                 {dataCube.body}
               </p>
             </Reveal>
-            <ul className="mt-8 grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:grid-rows-3 sm:auto-rows-fr">
+            <div className="mt-7 flex items-center justify-between gap-3">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/45">
+                {dataCube.hud.pickHint}
+              </p>
+              {!reduce && (
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  aria-label={playing ? dataCube.hud.pause : dataCube.hud.play}
+                  className="flex shrink-0 items-center gap-1.5 border border-white/15 bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/70 transition-colors hover:border-green-400/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400/70"
+                >
+                  <span aria-hidden className="text-green-300/90">
+                    {playing ? "❚❚" : "▶"}
+                  </span>
+                  <span>{playing ? "Pause" : "Play"}</span>
+                </button>
+              )}
+            </div>
+            <ul className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:grid-rows-3 sm:auto-rows-fr">
               {dataCube.layers.map((layer, i) => {
                 const face = FACES[i];
                 const active = activeFace !== null && activeFace === face.key;
                 const green = face.accent === "green";
+                const isBind = BIND.has(face.key);
                 return (
                   <Reveal as="li" key={layer.label} delay={i * 0.04} y={12} className="list-none h-full">
                     <div
+                      role="button"
                       tabIndex={0}
+                      aria-pressed={pinned === face.key}
+                      onClick={() => presentFace(face.key)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          presentFace(face.key);
+                        }
+                      }}
                       onMouseEnter={() => setActiveFace(face.key)}
-                      onMouseLeave={() => setActiveFace(null)}
+                      onMouseLeave={() => setActiveFace(pinned)}
                       onFocus={() => setActiveFace(face.key)}
-                      onBlur={() => setActiveFace(null)}
-                      className={`group flex h-full items-center gap-3 rounded-sm border px-4 py-3 text-sm outline-none transition-all duration-300 focus-visible:ring-1 focus-visible:ring-green-400/60 ${
+                      onBlur={() => setActiveFace(pinned)}
+                      className={`group flex h-full cursor-pointer items-center gap-3 rounded-sm border px-4 py-3 text-sm outline-none transition-all duration-300 focus-visible:ring-1 focus-visible:ring-green-400/60 ${
                         active
                           ? green
                             ? "translate-x-1 border-green-400/60 bg-green-500/10 text-white"
                             : "translate-x-1 border-blue-300/60 bg-blue-500/10 text-white"
                           : "border-white/10 bg-white/[0.04] text-white/75 hover:border-white/25"
-                      }`}
+                      } ${pinned === face.key ? "ring-1 ring-green-400/40" : ""}`}
                     >
                       <span
                         className={`h-4 w-[3px] shrink-0 transition-transform duration-300 ${
@@ -893,7 +1225,17 @@ export function DataCubeTeaser() {
                         } ${active ? "scale-y-125 shadow-[0_0_10px_rgba(101,196,123,0.9)]" : ""}`}
                       />
                       <span className="flex-1">
-                        <span className="block font-medium">{layer.label}</span>
+                        <span className="flex items-center gap-1.5 font-medium">
+                          {layer.label}
+                          {isBind && (
+                            <span
+                              className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/35"
+                              title="Geospatial ⊕ legal/regulatory — the bind"
+                            >
+                              bind
+                            </span>
+                          )}
+                        </span>
                         <span className="block text-xs text-white/60">{layer.detail}</span>
                       </span>
                       <span

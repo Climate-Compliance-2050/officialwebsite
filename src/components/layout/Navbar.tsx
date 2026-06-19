@@ -25,6 +25,11 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // clear any pending dropdown-close timer if we unmount mid-hover
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
+
   // close menus on route change (adjust-state-during-render pattern)
   const [prevPath, setPrevPath] = useState(pathname);
   if (prevPath !== pathname) {

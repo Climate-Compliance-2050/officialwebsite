@@ -47,7 +47,7 @@ export const hero = {
   subheadline:
     "C2050 integrates legal and regulatory intelligence with geospatial coordinates, so every point on the map carries the rules that govern it, from carbon rights to Article 6 eligibility.",
   primaryCta: { label: "Assess an Asset", href: "/contact" },
-  secondaryCta: { label: "Explore the Platform", href: "/about" },
+  secondaryCta: { label: "Explore the Platform", href: "/products" },
   caption: "Other platforms map the territory. We map the law that governs it.",
 };
 
@@ -95,55 +95,32 @@ export const problem = {
     "C2050 closes this gap with decision-grade confidence: structured risk visibility across every dimension of an environmental asset, before decisions are made.",
 };
 
-export const fiveLayers = {
-  eyebrow: "The Platform",
-  headline: "Five intelligence layers. One asset view.",
-  body: "Every environmental asset is assessed across five integrated layers, from the territory it occupies to the rules that govern it, producing a single, evidence-based integrity profile.",
-  layers: [
-    {
-      name: "Territory",
-      title: "Geospatial Intelligence",
-      body: "Satellite imagery, boundary verification, land-use dynamics and overlap detection for the physical asset base.",
-    },
-    {
-      name: "Legal",
-      title: "Legal Intelligence",
-      body: "Land tenure, carbon rights, contractual chains and benefit-sharing structures mapped to applicable law.",
-    },
-    {
-      name: "Regulatory",
-      title: "Regulatory Intelligence",
-      body: "Article 6, CORSIA, national frameworks and registry rules: eligibility and compliance status, monitored as rules evolve.",
-    },
-    {
-      name: "Technical",
-      title: "Technical Intelligence",
-      body: "Methodology conformance, data quality and quantification integrity across the project's technical documentation.",
-    },
-    {
-      name: "Science",
-      title: "Scientific Intelligence",
-      body: "Carbon-stock models, baselines, additionality indicators and MRV evidence assessed against current science.",
-    },
-  ],
-  outcome: {
-    name: "Asset Intelligence",
-    body: "An integrated, evidence-based integrity assessment, structured for decisions and ready for independent validation.",
-  },
-};
-
 export const dataCube = {
   eyebrow: "The Data Cube",
-  headline: "One territory. Every layer. A single point of truth.",
-  body: "The C2050 Data Cube anchors an environmental asset to its territory, then integrates every layer of data around it. Where the layers intersect, value is validated: one secure point of evidence for intelligence-based, data-driven decisions.",
+  headline: "One coordinate. Every pillar. A financial asset.",
+  body: "The Data Cube takes a point from the territory — its coordinates — then binds every pillar to it: geospatial, legal, regulatory, scientific, technical. Legal and regulatory standing, locked to the coordinate. Competitors do geospatial or legal; C2050 binds them — the evidence base that lets an environmental asset stand as a financial one.",
+  /* Order matches the cube faces in DataCubeTeaser (FACES). Territory is the
+     point taken from the land; the five pillars bind to it. Geospatial (green)
+     meeting Legal + Regulatory (blue) is the bind — C2050's differentiator. */
   layers: [
-    { label: "Territory", detail: "Coordinates, boundaries & plotted points" },
-    { label: "Geospatial", detail: "Footprint, terrain & land-use layers" },
-    { label: "Scientific", detail: "Models, baselines & MRV evidence" },
-    { label: "Legal", detail: "Rights, tenure & ownership" },
-    { label: "Regulatory", detail: "Rules, eligibility & compliance" },
-    { label: "Technical", detail: "Lifecycle, methodology & market readiness" },
+    { label: "Territory", detail: "The point we take — coordinates, boundaries & plotted assets" },
+    { label: "Geospatial", detail: "Footprint, terrain & land-use — the geospatial fact" },
+    { label: "Legal", detail: "Tenure, carbon rights & ownership — locked to the coordinate" },
+    { label: "Regulatory", detail: "Article 6, CORSIA & eligibility — locked to the coordinate" },
+    { label: "Scientific", detail: "Carbon-stock models, baselines & MRV evidence" },
+    { label: "Technical", detail: "Methodology, lifecycle & market readiness" },
   ],
+  /* Instrument chrome — the brand-bearing strings the Data Cube renders.
+     Neutral phase verbs ("extracting…") stay inline in the component. */
+  hud: {
+    bind: "Geospatial ⊕ Legal · locked to coordinate",
+    payoff: { from: "Environmental asset", to: "Financial asset" },
+    validated: "Asset → financial asset · decision-grade",
+    validateHint: "Tap to validate",
+    pickHint: "Pick a pillar to inspect",
+    play: "Play walkthrough",
+    pause: "Pause walkthrough",
+  },
   cta: { label: "Inside the Data Cube", href: "/about" },
 };
 
@@ -224,13 +201,14 @@ export const clarifier = {
   is: "C2050 is decision-support intelligence and compliance infrastructure. We give market participants the evidence base to act with confidence.",
   isNot:
     "C2050 is not a carbon standard, registry, broker, verification and validation body, or investment adviser. We do not issue credits, certify projects or provide investment advice.",
+  valuesEyebrow: "Operating principles",
 };
 
 export const homeCta = {
   headline: "Bring decision-grade confidence to your next environmental asset.",
   body: "Talk to our team about screening a territory, assessing a project, or integrating C2050 intelligence into your workflow.",
   primaryCta: { label: "Assess an Asset", href: "/contact" },
-  secondaryCta: { label: "Explore the Platform", href: "/about" },
+  secondaryCta: { label: "Explore the Platform", href: "/products" },
 };
 
 export const footer = {

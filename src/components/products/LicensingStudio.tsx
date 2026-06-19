@@ -130,7 +130,7 @@ export function LicensingStudio({ tiers, billing, dna }: Props) {
                   {dna.aside}
                 </span>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {dna.pillars.map((p) => (
                   <div
                     key={p.label}

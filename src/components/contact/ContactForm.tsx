@@ -54,12 +54,14 @@ export function ContactForm() {
     const formEl = e.currentTarget;
     const data = new FormData(formEl);
     const fields = ["name", "email", "organization", "message"];
-    const allValid = fields
-      .map((f) => validateField(f, String(data.get(f) ?? "")))
-      .every(Boolean);
-    if (!allValid) {
-      const firstInvalid = formEl.querySelector<HTMLElement>("[aria-invalid='true'], input, textarea");
-      firstInvalid?.focus();
+    // Validate every field (so all error messages render), then focus the first
+    // that failed. (Can't query [aria-invalid] here — setErrors hasn't flushed to
+    // the DOM yet, and a selector list resolves in document order, not clause order.)
+    const firstInvalid = fields.filter(
+      (f) => !validateField(f, String(data.get(f) ?? "")),
+    )[0];
+    if (firstInvalid) {
+      (formEl.elements.namedItem(firstInvalid) as HTMLElement | null)?.focus();
       return;
     }
 
