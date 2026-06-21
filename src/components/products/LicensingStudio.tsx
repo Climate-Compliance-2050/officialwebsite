@@ -21,6 +21,7 @@ type Tier = {
   tagline: string;
   features: string[];
   bestFor: string;
+  cta: string;
   highlight?: boolean;
   admin?: boolean;
 };
@@ -277,7 +278,7 @@ function TierBox({ tier, mode }: { tier: Tier; mode?: BillingMode }) {
           href={`/contact?tier=${encodeURIComponent(tier.name)}`}
           className="group/req inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 transition-colors hover:text-green-800"
         >
-          Request access
+          {tier.cta}
           <ArrowRight
             className="h-3.5 w-3.5 transition-transform duration-200 group-hover/req:translate-x-0.5"
             aria-hidden

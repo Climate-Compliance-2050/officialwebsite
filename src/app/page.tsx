@@ -3,6 +3,7 @@ import { Problem } from "@/components/home/Problem";
 import { DataCubeTeaser } from "@/components/home/DataCubeTeaser";
 import { WorkflowStrip } from "@/components/home/WorkflowStrip";
 import { Audiences } from "@/components/home/Audiences";
+import { GlobalTeaser } from "@/components/home/GlobalTeaser";
 import { ClarifierBanner } from "@/components/home/ClarifierBanner";
 import { PartnersStrip } from "@/components/home/PartnersStrip";
 import { HomeCta } from "@/components/home/HomeCta";
@@ -15,6 +16,7 @@ export default function HomePage() {
       <DataCubeTeaser />
       <WorkflowStrip />
       <Audiences />
+      <GlobalTeaser />
       <ClarifierBanner />
       <PartnersStrip />
       <HomeCta />

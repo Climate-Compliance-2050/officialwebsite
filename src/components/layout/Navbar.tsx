@@ -71,14 +71,27 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 lg:flex">
-          {nav.links.map((link) => (
-            <div
-              key={link.label}
-              className="relative"
-              onMouseEnter={() => openMenu(link.label)}
-              onMouseLeave={scheduleClose}
-            >
-              <button
+          {nav.links.map((link) =>
+            !link.children ? (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`nav-underline rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                  overDark
+                    ? "text-white/85 hover:text-white"
+                    : "text-navy-800 hover:text-blue-600"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <div
+                key={link.label}
+                className="relative"
+                onMouseEnter={() => openMenu(link.label)}
+                onMouseLeave={scheduleClose}
+              >
+                <button
                 type="button"
                 aria-expanded={openDropdown === link.label}
                 aria-haspopup="true"
@@ -127,8 +140,9 @@ export function Navbar() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-          ))}
+              </div>
+            )
+          )}
           <Link
             href={nav.cta.href}
             className="btn-sheen ml-3 rounded-sm bg-green-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/25 active:scale-[0.98]"
@@ -162,24 +176,34 @@ export function Navbar() {
             className="overflow-hidden border-t border-navy-900/10 bg-white lg:hidden"
           >
             <div className="space-y-4 px-4 py-6">
-              {nav.links.map((link) => (
-                <div key={link.label}>
-                  <span className="block px-2 text-xs font-semibold uppercase tracking-wider text-navy-900/50">
+              {nav.links.map((link) =>
+                !link.children ? (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="block px-2 py-2.5 text-base font-semibold text-navy-900 hover:bg-green-50"
+                  >
                     {link.label}
-                  </span>
-                  <div className="mt-1">
-                    {link.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className="block rounded-lg px-2 py-2.5 text-base font-medium text-navy-900 hover:bg-green-50"
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
+                  </Link>
+                ) : (
+                  <div key={link.label}>
+                    <span className="block px-2 text-xs font-semibold uppercase tracking-wider text-navy-900/50">
+                      {link.label}
+                    </span>
+                    <div className="mt-1">
+                      {link.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className="block rounded-lg px-2 py-2.5 text-base font-medium text-navy-900 hover:bg-green-50"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
               <Link
                 href={nav.cta.href}
                 className="block rounded-sm bg-green-500 px-5 py-3 text-center text-base font-semibold text-white"

@@ -22,19 +22,41 @@ export function ContactForm() {
   const bannerRef = useRef<HTMLDivElement>(null);
   const studyNameRef = useRef<HTMLSpanElement>(null);
 
-  // Prefill from a deep link like /contact?study=Land%20Eligibility (Services page).
-  // Read on mount via window.location to avoid forcing a Suspense boundary; reveal
-  // the banner imperatively so there's no setState-in-effect / hydration mismatch.
+  // Prefill from a deep link. Read on mount via window.location to avoid forcing a
+  // Suspense boundary; reveal the banner imperatively so there's no setState-in-effect
+  // / hydration mismatch.
+  //   ?study=…   → message draft + interest (Services page)
+  //   ?intent=…  → preselect interest by audience (Who We Serve CTAs)
+  //   ?tier=…    → preselect interest by licence tier (Products CTAs)
   useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("study");
-    if (!requested) return;
+    const params = new URLSearchParams(window.location.search);
     const el = formRef.current;
     if (!el) return;
+    const interest = el.elements.namedItem("interest") as HTMLSelectElement | null;
+
+    // Map an audience intent or licence tier onto the "What do you need?" options.
+    const INTENT_TO_INTEREST: Record<string, string> = {
+      supplier: "Assess an asset or territory",
+      demander: "Explore the platform (demo)",
+      facilitator: "Partnership / join the ecosystem",
+    };
+    const TIER_TO_INTEREST: Record<string, string> = {
+      "Asset Viewer": "Explore the platform (demo)",
+      "Asset Manager": "Explore the platform (demo)",
+      "Asset Expert": "Assess an asset or territory",
+      "Sovereign & Enterprise (White Label)": "Partnership / join the ecosystem",
+    };
+    const preselect =
+      INTENT_TO_INTEREST[params.get("intent") ?? ""] ??
+      TIER_TO_INTEREST[params.get("tier") ?? ""];
+    if (interest && preselect) interest.value = preselect;
+
+    const requested = params.get("study");
+    if (!requested) return;
     const message = el.elements.namedItem("message") as HTMLTextAreaElement | null;
     if (message && !message.value) {
       message.value = `I'd like to request the "${requested}" study. Here is some context about my parcel, project or jurisdiction:\n\n`;
     }
-    const interest = el.elements.namedItem("interest") as HTMLSelectElement | null;
     if (interest) interest.value = "Assess an asset or territory";
     if (studyNameRef.current) studyNameRef.current.textContent = requested;
     bannerRef.current?.removeAttribute("hidden");

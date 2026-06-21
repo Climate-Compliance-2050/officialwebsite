@@ -37,8 +37,12 @@ export const nav = {
         { label: "Partners", href: "/partners", description: "Organizations we work with" },
       ],
     },
+    {
+      label: "Global",
+      href: "/global",
+    },
   ],
-  cta: { label: "Assess an Asset", href: "/contact" },
+  cta: { label: "Submit a Territory", href: "/contact" },
 };
 
 export const hero = {
@@ -46,8 +50,8 @@ export const hero = {
   headline: "Every coordinate is subject to a law.",
   subheadline:
     "C2050 integrates legal and regulatory intelligence with geospatial coordinates, so every point on the map carries the rules that govern it, from carbon rights to Article 6 eligibility.",
-  primaryCta: { label: "Assess an Asset", href: "/contact" },
-  secondaryCta: { label: "Explore the Platform", href: "/products" },
+  primaryCta: { label: "Submit a Territory", href: "/contact" },
+  secondaryCta: { label: "See How It Works", href: "/products" },
   caption: "Other platforms map the territory. We map the law that governs it.",
 };
 
@@ -134,6 +138,7 @@ export const audiences = {
       body: "Structure assets correctly from day one. Demonstrate integrity with evidence, not assertions, and reach qualified demand.",
       examples: ["Project developers", "Landowners", "Governments & jurisdictions"],
       icon: "landowners" as const,
+      cta: { label: "Structure your asset", href: "/contact?intent=supplier" },
     },
     {
       name: "Demanders",
@@ -141,6 +146,7 @@ export const audiences = {
       body: "Screen before you commit. Decision-grade confidence on integrity, legal rights and regulatory eligibility, before capital moves.",
       examples: ["Corporate buyers", "Investors & funds", "Compliance entities"],
       icon: "buyers" as const,
+      cta: { label: "Screen before you commit", href: "/contact?intent=demander" },
     },
     {
       name: "Facilitators",
@@ -148,6 +154,7 @@ export const audiences = {
       body: "Serve clients on a shared evidence base. Structured asset intelligence that plugs into diligence, audit and advisory workflows.",
       examples: ["Brokers & exchanges", "VVBs & auditors", "Insurers, banks & legal advisors"],
       icon: "brokers" as const,
+      cta: { label: "Integrate C2050 into your workflow", href: "/contact?intent=facilitator" },
     },
   ],
 };
@@ -207,8 +214,8 @@ export const clarifier = {
 export const homeCta = {
   headline: "Bring decision-grade confidence to your next environmental asset.",
   body: "Talk to our team about screening a territory, assessing a project, or integrating C2050 intelligence into your workflow.",
-  primaryCta: { label: "Assess an Asset", href: "/contact" },
-  secondaryCta: { label: "Explore the Platform", href: "/products" },
+  primaryCta: { label: "Submit a Territory", href: "/contact" },
+  secondaryCta: { label: "See How It Works", href: "/products" },
 };
 
 export const footer = {
@@ -235,6 +242,7 @@ export const footer = {
         { label: "Products", href: "/products" },
         { label: "Services", href: "/services" },
         { label: "Partners", href: "/partners" },
+        { label: "Global", href: "/global" },
       ],
     },
   ],

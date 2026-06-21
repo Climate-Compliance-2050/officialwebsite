@@ -110,6 +110,7 @@ export const productsPage = {
         "Receive and view project data shared by license holders",
       ],
       bestFor: "Prospects, stakeholders and secondary buyers interacting with assessed project information.",
+      cta: "Get viewer access",
     },
     {
       code: "02",
@@ -125,6 +126,7 @@ export const productsPage = {
       ],
       bestFor: "Organizations that need to track, organize and evidence the compliance of their environmental asset holdings.",
       highlight: true,
+      cta: "Request a demo",
     },
     {
       code: "03",
@@ -139,6 +141,7 @@ export const productsPage = {
         "Independent due-diligence workflows",
       ],
       bestFor: "Advanced investors, scientists and auditors requiring in-depth territorial analysis and maximum data flexibility.",
+      cta: "Talk to a specialist",
     },
     {
       code: "04",
@@ -153,6 +156,7 @@ export const productsPage = {
         "Smart Compliance Badges: build proprietary rating frameworks on custom criteria (ESG policies, legal audits, nesting procedures)",
       ],
       bestFor: "Institutions running jurisdictional programs or internal market infrastructure on C2050 rails.",
+      cta: "Schedule a briefing",
     },
   ],
   badges: {

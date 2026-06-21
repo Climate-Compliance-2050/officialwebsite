@@ -161,7 +161,7 @@ export const storyPage = {
 export const contactPage = {
   hero: {
     eyebrow: "Contact",
-    headline: "Assess an asset. Explore the platform. Join the ecosystem.",
+    headline: "Tell us about your asset.",
     body: "Tell us about your territory, project or portfolio. Our team responds within two business days.",
   },
   form: {

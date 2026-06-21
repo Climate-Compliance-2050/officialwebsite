@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { BrandIcon } from "@/components/ui/BrandIcon";
@@ -52,6 +54,16 @@ export function Audiences() {
                   </li>
                 ))}
               </ul>
+              <Link
+                href={segment.cta.href}
+                className="reticle group/cta mt-6 inline-flex items-center gap-1.5 self-start border border-white/15 px-4 py-2 text-sm font-semibold text-green-400 transition-colors hover:border-green-400/50 hover:text-green-300"
+              >
+                {segment.cta.label}
+                <ArrowRight
+                  className="h-3.5 w-3.5 transition-transform duration-200 group-hover/cta:translate-x-0.5"
+                  aria-hidden
+                />
+              </Link>
             </Reveal>
           ))}
         </div>

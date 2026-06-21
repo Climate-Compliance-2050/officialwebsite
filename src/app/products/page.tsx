@@ -81,7 +81,7 @@ export default function ProductsPage() {
               </p>
               <div className="mt-8">
                 <ButtonLink href="/contact" arrow>
-                  Talk to our team
+                  Configure a Badge framework
                 </ButtonLink>
               </div>
             </Reveal>
