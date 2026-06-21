@@ -186,7 +186,7 @@ export default function ServicesPage() {
             <h2 className="mt-4 font-serif text-3xl font-semibold leading-[1.15] tracking-tight sm:text-4xl">
               Not sure which study you need? We&apos;ll scope it with you.
             </h2>
-            <p className="mt-5 text-base leading-7 text-white/70 sm:text-lg">
+            <p className="text-doc mt-5 text-base leading-7 text-white/70 sm:text-lg">
               Tell us about your parcel, project or jurisdiction. We&apos;ll map it to the
               right study — from a first screening to a validation-ready evidence base.
             </p>

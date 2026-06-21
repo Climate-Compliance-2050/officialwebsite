@@ -138,7 +138,7 @@ export default function GlobalPage() {
             <h2 className="mt-4 font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
               {g.tieIn.headline}
             </h2>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
+            <p className="text-doc mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
               {g.tieIn.body}
             </p>
             <div className="mt-9 flex flex-wrap gap-4">

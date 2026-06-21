@@ -84,7 +84,7 @@ export function CinematicHero({ eyebrow, headline, body, video }: CinematicHeroP
         </Reveal>
         {body && (
           <Reveal delay={0.24}>
-            <p className="mt-7 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">
+            <p className="text-doc mt-7 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">
               {body}
             </p>
           </Reveal>

@@ -65,7 +65,7 @@ export function GlobalTeaser() {
               <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
                 {teaser.headline}
               </h2>
-              <p className="mt-5 text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
+              <p className="text-doc mt-5 text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
                 {teaser.body}
               </p>
             </Reveal>

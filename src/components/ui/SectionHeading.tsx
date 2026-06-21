@@ -38,8 +38,8 @@ export function SectionHeading({
       {body && (
         <p
           className={`mt-5 text-base leading-7 sm:text-lg sm:leading-8 ${
-            dark ? "text-white/70" : "text-navy-900/70"
-          }`}
+            align === "left" ? "text-doc " : ""
+          }${dark ? "text-white/70" : "text-navy-900/70"}`}
         >
           {body}
         </p>

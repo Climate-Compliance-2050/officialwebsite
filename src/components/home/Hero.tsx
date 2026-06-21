@@ -182,7 +182,7 @@ export function Hero() {
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            className="mt-6 text-base leading-7 text-white/70 sm:text-lg sm:leading-8"
+            className="text-doc mt-6 text-base leading-7 text-white/70 sm:text-lg sm:leading-8"
           >
             {hero.subheadline}
           </motion.p>

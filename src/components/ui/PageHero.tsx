@@ -59,7 +59,7 @@ export function PageHero({ eyebrow, headline, body, media, backdrop, children }:
             {headline}
           </h1>
           {body && (
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
+            <p className="text-doc mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
               {body}
             </p>
           )}
