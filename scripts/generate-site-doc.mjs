@@ -408,7 +408,7 @@ children.push(divider(), h1("10. Contact  (/contact)"));
 
 children.push(eyebrow("Contact"));
 children.push(h2("Assess an asset. Explore the platform. Join the ecosystem."));
-children.push(body("Tell us about your territory, project or portfolio. Our team responds within two business days."));
+children.push(body("Tell us about your territory, project or portfolio."));
 children.push(h2("Form Fields"));
 children.push(bullet("Full name"));
 children.push(bullet("Work email"));

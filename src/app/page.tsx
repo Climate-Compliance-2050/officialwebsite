@@ -1,6 +1,6 @@
 import { Hero } from "@/components/home/Hero";
 import { Problem } from "@/components/home/Problem";
-import { DataCubeTeaser } from "@/components/home/DataCubeTeaser";
+import { DataCubeStack } from "@/components/home/DataCubeStack";
 import { WorkflowStrip } from "@/components/home/WorkflowStrip";
 import { Audiences } from "@/components/home/Audiences";
 import { GlobalTeaser } from "@/components/home/GlobalTeaser";
@@ -13,7 +13,7 @@ export default function HomePage() {
     <>
       <Hero />
       <Problem />
-      <DataCubeTeaser />
+      <DataCubeStack />
       <WorkflowStrip />
       <Audiences />
       <GlobalTeaser />

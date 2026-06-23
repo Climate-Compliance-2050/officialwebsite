@@ -242,7 +242,7 @@ export function ContactForm() {
       <p aria-live="polite" className="text-sm">
         {status === "sent" && (
           <span className="font-medium text-green-700">
-            Thank you! Your message is on its way. We respond within two business days.
+            Thank you! Your message is on its way.
           </span>
         )}
         {status === "error" && (

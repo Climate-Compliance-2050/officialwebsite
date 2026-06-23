@@ -103,9 +103,10 @@ export const dataCube = {
   eyebrow: "The Data Cube",
   headline: "One coordinate. Every pillar. A financial asset.",
   body: "The Data Cube takes a point from the territory — its coordinates — then binds every pillar to it: geospatial, legal, regulatory, scientific, technical. Legal and regulatory standing, locked to the coordinate. Competitors do geospatial or legal; C2050 binds them — the evidence base that lets an environmental asset stand as a financial one.",
-  /* Order matches the cube faces in DataCubeTeaser (FACES). Territory is the
-     point taken from the land; the five pillars bind to it. Geospatial (green)
-     meeting Legal + Regulatory (blue) is the bind — C2050's differentiator. */
+  /* Order matches the slab stack in DataCubeStack (SLABS), bottom → top.
+     Territory is the base — the point taken from the land; the five pillars
+     stack and bind to it. Geospatial (green) sitting under Legal + Regulatory
+     (blue) is the bind seam — C2050's differentiator. */
   layers: [
     { label: "Territory", detail: "The point we take — coordinates, boundaries & plotted assets" },
     { label: "Geospatial", detail: "Footprint, terrain & land-use — the geospatial fact" },
@@ -114,6 +115,15 @@ export const dataCube = {
     { label: "Scientific", detail: "Carbon-stock models, baselines & MRV evidence" },
     { label: "Technical", detail: "Methodology, lifecycle & market readiness" },
   ],
+  /* Left narrative axis (from Ludovino's slide) — three rungs the stacked
+     instrument lights as it assembles: foundation → intelligence → transformation.
+     Copy carried verbatim from his "EDGE CUBE" reference. */
+  axis: [
+    { key: "foundation", label: "Foundation", note: "Geospatial reality as the single source of truth" },
+    { key: "intelligence", label: "Intelligence", note: "Integrated insights across 5 dimensions" },
+    { key: "transformation", label: "Transformation", note: "Territorial data becomes a tradable asset" },
+  ],
+  tagline: "One geospatial foundation. Five intelligence dimensions. A financial asset.",
   /* Instrument chrome — the brand-bearing strings the Data Cube renders.
      Neutral phase verbs ("extracting…") stay inline in the component. */
   hud: {
@@ -253,4 +263,18 @@ export const footer = {
   disclaimer:
     "C2050 is not a carbon standard, registry, broker, verification and validation body, or investment adviser. C2050 provides decision-support intelligence and compliance infrastructure.",
   copyright: `© ${new Date().getFullYear()} Climate Compliance 2050. All rights reserved.`,
+};
+
+export const consent = {
+  // Bumping this version re-prompts every visitor (e.g. when the policy changes).
+  version: "2026-06-21",
+  eyebrow: "Cookie notice",
+  message:
+    "C2050 uses only the essential cookies the site needs to function. We set no advertising or tracking cookies. Continuing to browse confirms you accept this and our policies below.",
+  accept: "Accept",
+  // Extend this array as the Cookie Policy / Terms of Use pages go live.
+  links: [
+    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Code of Ethics", href: "/code-of-ethics" },
+  ],
 };
