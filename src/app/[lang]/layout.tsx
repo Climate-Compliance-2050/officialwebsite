@@ -46,7 +46,7 @@ export async function generateMetadata({
   const { site } = await getDictionary(lang);
   return {
     title: {
-      default: `${site.name} · ${site.tagline}`,
+      default: site.name,
       template: `%s · ${site.name}`,
     },
     description: site.description,
