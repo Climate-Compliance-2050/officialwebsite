@@ -1,9 +1,12 @@
-﻿import { SectionHeading } from "@/components/ui/SectionHeading";
+﻿"use client";
+
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { BrandIcon } from "@/components/ui/BrandIcon";
-import { problem } from "@/content/site";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 export function Problem() {
+  const { problem } = useContent();
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

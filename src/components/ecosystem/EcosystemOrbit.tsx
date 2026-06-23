@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { BrandIcon } from "@/components/ui/BrandIcon";
-import { ecosystemPage } from "@/content/ecosystem";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 const SPIN_SECONDS = 140;
 
@@ -12,6 +12,7 @@ const SPIN_SECONDS = 140;
  * ecosystem actors in controlled orbit (not a logo cloud).
  */
 export function EcosystemOrbit() {
+  const { ecosystemPage } = useContent();
   const reduce = useReducedMotion();
   const actors = ecosystemPage.actors;
   const inner = actors.slice(0, 5);

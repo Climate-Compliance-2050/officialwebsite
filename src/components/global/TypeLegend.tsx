@@ -1,10 +1,12 @@
-import { globalPage } from "@/content/global";
-import { TypeCode, TypeTick } from "./TypeMark";
+"use client";
 
-const { legend } = globalPage;
+import { useContent } from "@/components/i18n/LocaleProvider";
+import { TypeCode, TypeTick } from "./TypeMark";
 
 /** Instrument-type taxonomy + sources + coverage footnote. */
 export function TypeLegend() {
+  const { globalPage } = useContent();
+  const { legend } = globalPage;
   return (
     <div className="border-t border-navy-900/10 pt-8">
       <div className="grid gap-4 sm:grid-cols-3">

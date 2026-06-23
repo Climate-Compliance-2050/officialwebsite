@@ -4,14 +4,26 @@ import { Quote } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
-import { storyPage } from "@/content/about";
+import { getDictionary } from "@/content/dictionaries";
+import type { Locale } from "@/content/locales";
 
-export const metadata: Metadata = {
-  title: "Our Story",
-  description: storyPage.hero.body,
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const { storyPage } = await getDictionary(lang as Locale);
+  return { title: "Our Story", description: storyPage.hero.body };
+}
 
-export default function OurStoryPage() {
+export default async function OurStoryPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const { storyPage } = await getDictionary(lang as Locale);
   return (
     <>
       <PageHero {...storyPage.hero} />

@@ -1,6 +1,9 @@
-import Link from "next/link";
+"use client";
+
 import Image from "next/image";
 import { MapPin } from "lucide-react";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 function LinkedInIcon({ className }: { className?: string }) {
   return (
@@ -9,9 +12,9 @@ function LinkedInIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-import { footer, site } from "@/content/site";
 
 export function Footer() {
+  const { footer, site } = useContent();
   return (
     <footer className="dark-section hairline-top relative bg-navy-950 text-white">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
@@ -62,12 +65,12 @@ export function Footer() {
                 <ul className="mt-4 space-y-3">
                   {col.links.map((link) => (
                     <li key={link.href}>
-                      <Link
+                      <LocaleLink
                         href={link.href}
                         className="text-sm text-white/70 transition-colors hover:text-green-400"
                       >
                         {link.label}
-                      </Link>
+                      </LocaleLink>
                     </li>
                   ))}
                 </ul>
@@ -88,13 +91,13 @@ export function Footer() {
           <p className="text-xs text-white/60">{footer.copyright}</p>
           <div className="flex gap-6">
             {footer.legal.map((link) => (
-              <Link
+              <LocaleLink
                 key={link.href}
                 href={link.href}
                 className="text-xs text-white/60 transition-colors hover:text-white/90"
               >
                 {link.label}
-              </Link>
+              </LocaleLink>
             ))}
           </div>
         </div>

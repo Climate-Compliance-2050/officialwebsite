@@ -123,14 +123,10 @@ export const dataCube = {
     { key: "intelligence", label: "Intelligence", note: "Integrated insights across 5 dimensions" },
     { key: "transformation", label: "Transformation", note: "Territorial data becomes a tradable asset" },
   ],
-  tagline: "One geospatial foundation. Five intelligence dimensions. A financial asset.",
   /* Instrument chrome — the brand-bearing strings the Data Cube renders.
      Neutral phase verbs ("extracting…") stay inline in the component. */
   hud: {
-    bind: "Geospatial ⊕ Legal · locked to coordinate",
     payoff: { from: "Environmental asset", to: "Financial asset" },
-    validated: "Asset → financial asset · decision-grade",
-    validateHint: "Tap to validate",
     pickHint: "Pick a pillar to inspect",
     play: "Play walkthrough",
     pause: "Pause walkthrough",

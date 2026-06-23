@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -19,9 +20,9 @@ export default function PrivacyPolicyPage() {
           <p>
             The full Privacy Policy is being finalized with counsel and will be published here.
             For data-protection questions in the meantime, please{" "}
-            <a href="/contact" className="font-medium text-blue-600 hover:text-blue-700">
+            <LocaleLink href="/contact" className="font-medium text-blue-600 hover:text-blue-700">
               contact our team
-            </a>
+            </LocaleLink>
             .
           </p>
         </div>

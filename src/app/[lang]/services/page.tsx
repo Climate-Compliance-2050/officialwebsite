@@ -5,12 +5,18 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
 import { StudiesFunnel } from "@/components/services/StudiesFunnel";
-import { servicesPage } from "@/content/ecosystem";
+import { getDictionary } from "@/content/dictionaries";
+import type { Locale } from "@/content/locales";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description: servicesPage.hero.body,
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const { servicesPage } = await getDictionary(lang as Locale);
+  return { title: "Services", description: servicesPage.hero.body };
+}
 
 /** Aperture/lens styling per discipline tone. Static class strings (Tailwind-safe). */
 const lensTone = {
@@ -30,7 +36,13 @@ const lensTone = {
   },
 } as const;
 
-export default function ServicesPage() {
+export default async function ServicesPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const { servicesPage } = await getDictionary(lang as Locale);
   const { valueProp, catalogue } = servicesPage;
 
   return (

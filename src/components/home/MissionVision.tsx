@@ -1,8 +1,11 @@
-﻿import { Compass, Eye } from "lucide-react";
+﻿"use client";
+
+import { Compass, Eye } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
-import { missionVision } from "@/content/site";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 export function MissionVision() {
+  const { missionVision } = useContent();
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

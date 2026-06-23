@@ -1,22 +1,45 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { nav, site } from "@/content/site";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useContent, useLang } from "@/components/i18n/LocaleProvider";
+import { locales, type Locale } from "@/content/locales";
+
+// EN/PT switch is built and wired end-to-end but hidden until the PT dictionary
+// is translated (src/content/pt/ currently re-exports EN). Flip to true to expose
+// the toggle. See CLAUDE.md § "Internationalization (i18n) — paused".
+const SHOW_LOCALE_TOGGLE = false;
 
 export function Navbar() {
+  const { nav, site } = useContent();
+  const lang = useLang();
   const pathname = usePathname();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Dark hero pages get a transparent navbar until scroll
-  const overDark = pathname === "/" && !scrolled;
+  // Dark hero pages get a transparent navbar until scroll. Home is now "/{lang}".
+  const overDark = pathname === `/${lang}` && !scrolled;
+
+  // Swap the leading locale segment of the current path, keeping the rest.
+  const pathForLocale = (target: Locale) => {
+    const segments = pathname.split("/");
+    segments[1] = target;
+    return segments.join("/") || "/";
+  };
+
+  const switchLocale = (target: Locale) => {
+    if (target === lang) return;
+    // Remember the choice so the proxy honors it on unprefixed visits.
+    document.cookie = `NEXT_LOCALE=${target};path=/;max-age=31536000;samesite=lax`;
+    router.push(pathForLocale(target));
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -46,6 +69,36 @@ export function Navbar() {
     closeTimer.current = setTimeout(() => setOpenDropdown(null), 120);
   };
 
+  const LocaleToggle = ({ className = "" }: { className?: string }) => (
+    <div
+      role="group"
+      aria-label="Language"
+      className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.12em] ${className}`}
+    >
+      {locales.map((l, i) => (
+        <Fragment key={l}>
+          {i > 0 && <span className="opacity-40" aria-hidden>·</span>}
+          <button
+            type="button"
+            onClick={() => switchLocale(l)}
+            aria-current={l === lang ? "true" : undefined}
+            className={`cursor-pointer px-1 py-0.5 transition-colors ${
+              l === lang
+                ? overDark
+                  ? "text-white"
+                  : "text-blue-600"
+                : overDark
+                  ? "text-white/55 hover:text-white"
+                  : "text-navy-800/55 hover:text-blue-600"
+            }`}
+          >
+            {l}
+          </button>
+        </Fragment>
+      ))}
+    </div>
+  );
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
@@ -58,7 +111,7 @@ export function Navbar() {
         aria-label="Main"
         className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:h-20 lg:px-8"
       >
-        <Link href="/" aria-label="C2050 home" className="flex items-center">
+        <LocaleLink href="/" aria-label="C2050 home" className="flex items-center">
           <Image
             src={overDark ? "/brand/logo-horizontal-white.webp" : "/brand/logo-horizontal.webp"}
             alt={`${site.legalName} logo`}
@@ -67,13 +120,13 @@ export function Navbar() {
             priority
             className="h-8 w-auto lg:h-9"
           />
-        </Link>
+        </LocaleLink>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-1 lg:flex">
           {nav.links.map((link) =>
             !link.children ? (
-              <Link
+              <LocaleLink
                 key={link.label}
                 href={link.href}
                 className={`nav-underline rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
@@ -83,7 +136,7 @@ export function Navbar() {
                 }`}
               >
                 {link.label}
-              </Link>
+              </LocaleLink>
             ) : (
               <div
                 key={link.label}
@@ -123,7 +176,7 @@ export function Navbar() {
                   >
                     <div className="overflow-hidden rounded-2xl border border-navy-900/10 bg-white p-2 shadow-xl shadow-navy-900/10">
                       {link.children.map((child) => (
-                        <Link
+                        <LocaleLink
                           key={child.href}
                           href={child.href}
                           className="block rounded-xl px-4 py-3 transition-colors hover:bg-green-50"
@@ -134,7 +187,7 @@ export function Navbar() {
                           <span className="mt-0.5 block text-xs leading-5 text-navy-900/60">
                             {child.description}
                           </span>
-                        </Link>
+                        </LocaleLink>
                       ))}
                     </div>
                   </motion.div>
@@ -143,26 +196,30 @@ export function Navbar() {
               </div>
             )
           )}
-          <Link
+          <LocaleLink
             href={nav.cta.href}
             className="btn-sheen ml-3 rounded-sm bg-green-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/25 active:scale-[0.98]"
           >
             {nav.cta.label}
-          </Link>
+          </LocaleLink>
+          {SHOW_LOCALE_TOGGLE && <LocaleToggle className="ml-4 pl-1" />}
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          type="button"
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((v) => !v)}
-          className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg lg:hidden ${
-            overDark && !mobileOpen ? "text-white" : "text-navy-900"
-          }`}
-        >
-          {mobileOpen ? <X className="h-6 w-6" aria-hidden /> : <Menu className="h-6 w-6" aria-hidden />}
-        </button>
+        {/* Mobile: language + menu toggle */}
+        <div className="flex items-center gap-2 lg:hidden">
+          {SHOW_LOCALE_TOGGLE && <LocaleToggle />}
+          <button
+            type="button"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((v) => !v)}
+            className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg ${
+              overDark && !mobileOpen ? "text-white" : "text-navy-900"
+            }`}
+          >
+            {mobileOpen ? <X className="h-6 w-6" aria-hidden /> : <Menu className="h-6 w-6" aria-hidden />}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile menu */}
@@ -178,13 +235,13 @@ export function Navbar() {
             <div className="space-y-4 px-4 py-6">
               {nav.links.map((link) =>
                 !link.children ? (
-                  <Link
+                  <LocaleLink
                     key={link.label}
                     href={link.href}
                     className="block px-2 py-2.5 text-base font-semibold text-navy-900 hover:bg-green-50"
                   >
                     {link.label}
-                  </Link>
+                  </LocaleLink>
                 ) : (
                   <div key={link.label}>
                     <span className="block px-2 text-xs font-semibold uppercase tracking-wider text-navy-900/50">
@@ -192,24 +249,24 @@ export function Navbar() {
                     </span>
                     <div className="mt-1">
                       {link.children.map((child) => (
-                        <Link
+                        <LocaleLink
                           key={child.href}
                           href={child.href}
                           className="block rounded-lg px-2 py-2.5 text-base font-medium text-navy-900 hover:bg-green-50"
                         >
                           {child.label}
-                        </Link>
+                        </LocaleLink>
                       ))}
                     </div>
                   </div>
                 )
               )}
-              <Link
+              <LocaleLink
                 href={nav.cta.href}
                 className="block rounded-sm bg-green-500 px-5 py-3 text-center text-base font-semibold text-white"
               >
                 {nav.cta.label}
-              </Link>
+              </LocaleLink>
             </div>
           </motion.div>
         )}

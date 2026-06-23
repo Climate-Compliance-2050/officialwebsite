@@ -1,27 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
-import { workflow } from "@/content/site";
-import { servicesPage } from "@/content/ecosystem";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 /** Accent ramp across the lifecycle: origination green → regulatory blue. */
 const ACCENTS = ["#00b050", "#0fa45a", "#16a36a", "#2c8bca", "#317ec0", "#345faa"];
-
-/** Dial geometry: node i sits on a circle of radius 41 (viewBox units), 12 o'clock first. */
-const NODE_POS = workflow.steps.map((_, i) => {
-  const angle = (i / workflow.steps.length) * Math.PI * 2;
-  return {
-    left: `${50 + 41 * Math.sin(angle)}%`,
-    top: `${50 - 41 * Math.cos(angle)}%`,
-  };
-});
 
 /** Each label sits on the inward side of its node so nothing escapes the dial. */
 const LABEL_POS = [
@@ -34,8 +24,21 @@ const LABEL_POS = [
 ];
 
 export function WorkflowStrip() {
+  const { workflow, servicesPage } = useContent();
   const steps = workflow.steps;
   const n = steps.length;
+  // Dial geometry: node i sits on a circle of radius 41 (viewBox units), 12 o'clock first.
+  const NODE_POS = useMemo(
+    () =>
+      steps.map((_, i) => {
+        const angle = (i / steps.length) * Math.PI * 2;
+        return {
+          left: `${50 + 41 * Math.sin(angle)}%`,
+          top: `${50 - 41 * Math.cos(angle)}%`,
+        };
+      }),
+    [steps],
+  );
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const reduce = useReducedMotion();
@@ -240,7 +243,7 @@ export function WorkflowStrip() {
                     </div>
                   )}
 
-                  <Link
+                  <LocaleLink
                     href="/services"
                     className="group mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-semibold text-green-700 transition-colors hover:text-green-600"
                   >
@@ -249,7 +252,7 @@ export function WorkflowStrip() {
                       className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
                       aria-hidden
                     />
-                  </Link>
+                  </LocaleLink>
                 </motion.div>
               </AnimatePresence>
             </div>

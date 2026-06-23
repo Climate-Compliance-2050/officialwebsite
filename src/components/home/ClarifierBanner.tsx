@@ -1,10 +1,13 @@
+"use client";
+
 import { Info } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
-import { clarifier, missionVision } from "@/content/site";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 /** Counsel-mandated clarifier: what C2050 is and is not, plus the principles
  *  the work is held to (absorbed from the former Mission/Vision section). */
 export function ClarifierBanner() {
+  const { clarifier, missionVision } = useContent();
   return (
     <section className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

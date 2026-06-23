@@ -6,12 +6,18 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
 import { MissionVision } from "@/components/home/MissionVision";
-import { aboutPage } from "@/content/about";
+import { getDictionary } from "@/content/dictionaries";
+import type { Locale } from "@/content/locales";
 
-export const metadata: Metadata = {
-  title: "About Us",
-  description: aboutPage.hero.body,
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const { aboutPage } = await getDictionary(lang as Locale);
+  return { title: "About Us", description: aboutPage.hero.body };
+}
 
 // Evidence registers: the data inputs every assessed asset is built on.
 const seals = [
@@ -20,7 +26,13 @@ const seals = [
   { code: "LEG", label: "Legal", note: "Compliance & regulatory posture" },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const { aboutPage } = await getDictionary(lang as Locale);
   const { dataCube, techFoundation, focus } = aboutPage;
   return (
     <>

@@ -3,15 +3,26 @@ import { MapPin } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { contactPage } from "@/content/about";
-import { clarifier } from "@/content/site";
+import { getDictionary } from "@/content/dictionaries";
+import type { Locale } from "@/content/locales";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: contactPage.hero.body,
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const { contactPage } = await getDictionary(lang as Locale);
+  return { title: "Contact", description: contactPage.hero.body };
+}
 
-export default function ContactPage() {
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const { contactPage, clarifier } = await getDictionary(lang as Locale);
   return (
     <>
       <PageHero {...contactPage.hero} />

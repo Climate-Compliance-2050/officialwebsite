@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
-import { contactPage } from "@/content/about";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 /**
  * Static-export-friendly contact form. If FORM_ENDPOINT is set (e.g. a
@@ -15,6 +15,7 @@ const CONTACT_EMAIL = "contact@c2050.com";
 type Status = "idle" | "sending" | "sent" | "error";
 
 export function ContactForm() {
+  const { contactPage } = useContent();
   const { form } = contactPage;
   const [status, setStatus] = useState<Status>("idle");
   const [errors, setErrors] = useState<Record<string, string>>({});

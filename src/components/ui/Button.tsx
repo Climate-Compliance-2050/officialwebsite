@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 
 type ButtonLinkProps = {
   href: string;
@@ -30,9 +30,9 @@ export function ButtonLink({
   className = "",
 }: ButtonLinkProps) {
   return (
-    <Link href={href} className={`${base} ${variants[variant]} ${className}`}>
+    <LocaleLink href={href} className={`${base} ${variants[variant]} ${className}`}>
       {children}
       {arrow && <ArrowRight className="h-4 w-4" aria-hidden />}
-    </Link>
+    </LocaleLink>
   );
 }

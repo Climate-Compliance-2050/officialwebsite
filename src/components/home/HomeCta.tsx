@@ -1,10 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
 import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
-import { homeCta, surveyDatum } from "@/content/site";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 export function HomeCta() {
+  const { homeCta, surveyDatum } = useContent();
   return (
     <section className="dark-section grain hairline-top relative overflow-hidden bg-gradient-to-b from-navy-900 to-navy-950 py-24 text-white lg:py-32">
       <SurveyBackdrop datum={{ x: "14%", y: "72%", label: surveyDatum.saoPaulo }} />

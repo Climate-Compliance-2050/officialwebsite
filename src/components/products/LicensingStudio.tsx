@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import { ArrowRight, Check } from "lucide-react";
 
 type Pillar = { label: string; note: string };
@@ -274,7 +274,7 @@ function TierBox({ tier, mode }: { tier: Tier; mode?: BillingMode }) {
         <span className="font-mono text-[10px] uppercase tracking-wider text-navy-900/45">
           {footer}
         </span>
-        <Link
+        <LocaleLink
           href={`/contact?tier=${encodeURIComponent(tier.name)}`}
           className="group/req inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 transition-colors hover:text-green-800"
         >
@@ -283,7 +283,7 @@ function TierBox({ tier, mode }: { tier: Tier; mode?: BillingMode }) {
             className="h-3.5 w-3.5 transition-transform duration-200 group-hover/req:translate-x-0.5"
             aria-hidden
           />
-        </Link>
+        </LocaleLink>
       </div>
     </div>
   );

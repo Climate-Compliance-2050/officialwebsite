@@ -1,15 +1,18 @@
-import Link from "next/link";
+"use client";
+
 import { ArrowRight } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { BrandIcon } from "@/components/ui/BrandIcon";
-import { audiences } from "@/content/site";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 // Dark register: navy chips vanish on a navy ground, so the third segment
 // carries green rather than navy.
 const tones = ["green", "blue", "green"] as const;
 
 export function Audiences() {
+  const { audiences } = useContent();
   return (
     <section className="dark-section grain relative overflow-hidden bg-navy-950 py-20 text-white lg:py-28">
       {/* faint technical grid backdrop — same register as the cube section */}
@@ -54,7 +57,7 @@ export function Audiences() {
                   </li>
                 ))}
               </ul>
-              <Link
+              <LocaleLink
                 href={segment.cta.href}
                 className="reticle group/cta mt-6 inline-flex items-center gap-1.5 self-start border border-white/15 px-4 py-2 text-sm font-semibold text-green-400 transition-colors hover:border-green-400/50 hover:text-green-300"
               >
@@ -63,7 +66,7 @@ export function Audiences() {
                   className="h-3.5 w-3.5 transition-transform duration-200 group-hover/cta:translate-x-0.5"
                   aria-hidden
                 />
-              </Link>
+              </LocaleLink>
             </Reveal>
           ))}
         </div>

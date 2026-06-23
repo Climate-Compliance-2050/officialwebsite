@@ -115,3 +115,30 @@ prose — never centered, short, or card copy; never raw `text-justify`.
 
 **Copy lives in `src/content/`**, English only for launch (pt-BR planned). Never
 hardcode user-facing strings in components.
+
+---
+
+## 4. Internationalization (i18n) — built, paused
+
+The full EN/PT switch is **implemented and wired end-to-end**, but the visible
+toggle is **hidden** until the Portuguese copy exists. Don't rebuild it; finish it.
+
+**What's live (don't touch unless translating):**
+- Subpath routing: every page is under `src/app/[lang]/`, served at `/en/…` and
+  `/pt/…`. Both prerender via `generateStaticParams`.
+- `src/proxy.ts` (Next 16 `proxy`, the renamed `middleware` — **not** `middleware.ts`):
+  unprefixed URL → redirect by `NEXT_LOCALE` cookie → `Accept-Language` → `en`.
+- Dictionary layer: `src/content/locales.ts`, `src/content/dictionaries.ts`
+  (`getDictionary`), `src/content/en/index.ts` (aggregates the existing copy modules).
+- Delivery: `LocaleProvider` + `useContent()` / `useLang()` (client), `LocaleLink`
+  (auto-prefixes locale onto internal hrefs; `ButtonLink` routes through it).
+- The toggle itself: `LocaleToggle` in `Navbar.tsx`, gated behind
+  `const SHOW_LOCALE_TOGGLE = false`. Flip to `true` to expose it.
+
+**What's stubbed (the only follow-up):** `src/content/pt/index.ts` re-exports `../en`
+as a placeholder, so `/pt` currently renders English. To finish: mirror the EN copy
+objects in `src/content/pt/` with translated values (same keys/shape), then set
+`SHOW_LOCALE_TOGGLE = true`.
+
+**Gotcha:** after moving route folders, Turbopack's HMR cache panics
+(`Failed to write app endpoint`). Kill dev + delete `.next` before restarting.

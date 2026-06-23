@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { consent } from "@/content/site";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 const STORAGE_KEY = "c2050-consent";
 
 export function ConsentBanner() {
-  // null = undecided (SSR + first paint); false = dismissed; true = shown
+  const { consent } = useContent();
+  // false until the mount effect confirms we must prompt — keeps SSR + first paint silent
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -56,12 +57,12 @@ export function ConsentBanner() {
                 {consent.links.map((link, i) => (
                   <span key={link.href}>
                     {i > 0 && <span aria-hidden> · </span>}
-                    <Link
+                    <LocaleLink
                       href={link.href}
                       className="nav-underline text-white/80 transition-colors hover:text-green-400"
                     >
                       {link.label}
-                    </Link>
+                    </LocaleLink>
                   </span>
                 ))}
               </span>

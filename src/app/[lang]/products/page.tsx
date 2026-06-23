@@ -5,14 +5,26 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { BrandIcon } from "@/components/ui/BrandIcon";
 import { ButtonLink } from "@/components/ui/Button";
 import { LicensingStudio } from "@/components/products/LicensingStudio";
-import { productsPage } from "@/content/ecosystem";
+import { getDictionary } from "@/content/dictionaries";
+import type { Locale } from "@/content/locales";
 
-export const metadata: Metadata = {
-  title: "Products",
-  description: productsPage.hero.body,
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const { productsPage } = await getDictionary(lang as Locale);
+  return { title: "Products", description: productsPage.hero.body };
+}
 
-export default function ProductsPage() {
+export default async function ProductsPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const { productsPage } = await getDictionary(lang as Locale);
   return (
     <>
       <PageHero {...productsPage.hero} />

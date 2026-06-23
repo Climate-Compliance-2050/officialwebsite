@@ -14,7 +14,7 @@ import {
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
-import { dataCube } from "@/content/site";
+import { useContent } from "@/components/i18n/LocaleProvider";
 
 /* ------------------------------------------------------------------ *
  * The Data Cube — slice build (response to Ludovino's "EDGE CUBE"
@@ -703,6 +703,7 @@ function SlabPlane({
 /* ------------------------- left narrative axis ------------------------- */
 
 function AxisRail({ lit }: { lit: number }) {
+  const { dataCube } = useContent();
   // axis runs bottom → top (foundation at the base), mirroring the slab stack
   const rungs = [...dataCube.axis].reverse(); // render top→bottom in DOM
   return (
@@ -748,9 +749,16 @@ function AxisRail({ lit }: { lit: number }) {
 
 /* ------------------------------ section ------------------------------ */
 
-type Mode = "assembling" | "collecting" | "bound";
+/** Mirror a render value into a ref so the rAF loop reads the latest without
+ *  re-subscribing. Assigning during render is valid for this "latest value" use. */
+function useLatestRef<T>(value: T) {
+  const ref = useRef(value);
+  ref.current = value;
+  return ref;
+}
 
 export function DataCubeStack() {
+  const { dataCube } = useContent();
   const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -765,9 +773,8 @@ export function DataCubeStack() {
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [playing, setPlaying] = useState(true);
   const [cycle, setCycle] = useState(0);
-  const [mode, setMode] = useState<Mode>("assembling");
+  const [bound, setBound] = useState(false); // legal⊕geospatial bind sealed
   const [litRungs, setLitRungs] = useState(1); // axis rungs active
-  const bound = mode === "bound";
 
   // free-orbit on the whole rig — user drags to rotate, holds where released.
   // orbitX = pitch, orbitY = yaw; both additive over the rig's designed 3/4 view.
@@ -789,36 +796,22 @@ export function DataCubeStack() {
   const webLayerRef = useRef<HTMLDivElement | null>(null);
   const cageRef = useRef<HTMLDivElement | null>(null);
 
-  const webRef = useRef<WebPoint[]>(web);
   const elapsed = useRef(0);
   const lastNow = useRef(0);
-  const inViewRef = useRef(false);
-  const playingRef = useRef(true);
-  const pinnedRef = useRef<string | null>(null);
-  const activeRef = useRef<string | null>(null);
-  const modeRef = useRef<Mode>("assembling");
+  const boundRef = useRef(false);
   const litRef = useRef(1);
 
-  useEffect(() => {
-    inViewRef.current = inView;
-  }, [inView]);
-  useEffect(() => {
-    playingRef.current = playing;
-  }, [playing]);
-  useEffect(() => {
-    pinnedRef.current = pinned;
-  }, [pinned]);
-  useEffect(() => {
-    activeRef.current = activeKey;
-  }, [activeKey]);
-  useEffect(() => {
-    webRef.current = web;
-  }, [web]);
+  // latest render values the rAF loop reads without re-subscribing
+  const webRef = useLatestRef(web);
+  const inViewRef = useLatestRef(inView);
+  const playingRef = useLatestRef(playing);
+  const pinnedRef = useLatestRef(pinned);
+  const activeRef = useLatestRef(activeKey);
 
-  const setModeSafe = useCallback((m: Mode) => {
-    if (modeRef.current !== m) {
-      modeRef.current = m;
-      setMode(m);
+  const setBoundSafe = useCallback((b: boolean) => {
+    if (boundRef.current !== b) {
+      boundRef.current = b;
+      setBound(b);
     }
   }, []);
   const setLitSafe = useCallback((l: number) => {
@@ -866,9 +859,9 @@ export function DataCubeStack() {
     if (beamRef.current) beamRef.current.style.opacity = "0.95";
     if (weldRef.current) weldRef.current.style.opacity = "0.9";
     if (cageRef.current) cageRef.current.style.opacity = "0.62";
-    setModeSafe("bound");
+    setBoundSafe(true);
     setLitSafe(3);
-  }, [reduce, web, placeSlabs, setModeSafe, setLitSafe]);
+  }, [reduce, web, placeSlabs, setBoundSafe, setLitSafe]);
 
   useAnimationFrame(() => {
     if (reduce || !inViewRef.current) {
@@ -900,7 +893,7 @@ export function DataCubeStack() {
         coreRef.current.style.opacity = `${0.2 + 0.2 * p}`;
         coreRef.current.style.transform = "scale(0.85)";
       }
-      setModeSafe(sealed ? "collecting" : "assembling");
+      setBoundSafe(false);
       setLitSafe(lit);
       return;
     }
@@ -946,7 +939,7 @@ export function DataCubeStack() {
     if (weldRef.current) weldRef.current.style.opacity = isBound ? "0.9" : `${0.15 + 0.3 * lvl}`;
     if (isBound) lit = 3;
 
-    setModeSafe(isBound ? "bound" : "collecting");
+    setBoundSafe(isBound);
     setLitSafe(lit);
   });
 

@@ -4,7 +4,8 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
 import { WorldInstrument } from "@/components/global/WorldInstrument";
-import { globalPage, typeColor } from "@/content/global";
+import { useContent } from "@/components/i18n/LocaleProvider";
+import { typeColor } from "@/content/global";
 
 /* ------------------------------------------------------------------ *
  * Global teaser — the real-coastline survey basemap (WorldInstrument)
@@ -14,9 +15,10 @@ import { globalPage, typeColor } from "@/content/global";
  * foregrounds the legal ⊕ geospatial bind.
  * ------------------------------------------------------------------ */
 
-const teaser = globalPage.homeTeaser;
+type Teaser = ReturnType<typeof useContent>["globalPage"]["homeTeaser"];
+type LegendTypes = ReturnType<typeof useContent>["globalPage"]["legend"]["types"];
 
-function WorldMap() {
+function WorldMap({ teaser, legendTypes }: { teaser: Teaser; legendTypes: LegendTypes }) {
   return (
     <div className="corners corners-faint relative aspect-[360/134] w-full overflow-hidden border border-white/10 bg-navy-950/40">
       <WorldInstrument className="h-full w-full" tone="panel" />
@@ -33,7 +35,7 @@ function WorldMap() {
 
       {/* type legend, top-right */}
       <div className="pointer-events-none absolute right-3 top-3 flex flex-col gap-1">
-        {globalPage.legend.types.map((t) => (
+        {legendTypes.map((t) => (
           <div
             key={t.type}
             className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-white/55"
@@ -51,6 +53,8 @@ function WorldMap() {
 }
 
 export function GlobalTeaser() {
+  const { globalPage } = useContent();
+  const teaser = globalPage.homeTeaser;
   return (
     <section className="dark-section grain hairline-top relative overflow-hidden bg-navy-900 py-20 text-white lg:py-28">
       <SurveyBackdrop ticks={false} />
@@ -88,7 +92,7 @@ export function GlobalTeaser() {
 
           {/* ---------------- World instrument ---------------- */}
           <Reveal delay={0.1} className="order-2">
-            <WorldMap />
+            <WorldMap teaser={teaser} legendTypes={globalPage.legend.types} />
           </Reveal>
         </div>
       </div>

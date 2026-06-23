@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 import {
   AnimatePresence,
   motion,
@@ -217,7 +217,7 @@ export function StudiesFunnel({ studies, filters }: Props) {
                         </p>
                       </div>
 
-                      <Link
+                      <LocaleLink
                         href={`/contact?study=${encodeURIComponent(study.name)}`}
                         className="group/req mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-green-700 transition-colors hover:text-green-800"
                       >
@@ -226,7 +226,7 @@ export function StudiesFunnel({ studies, filters }: Props) {
                           className="h-4 w-4 transition-transform duration-200 group-hover/req:translate-x-0.5"
                           aria-hidden
                         />
-                      </Link>
+                      </LocaleLink>
                     </div>
                   </div>
                 </motion.article>

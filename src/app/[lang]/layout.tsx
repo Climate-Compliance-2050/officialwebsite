@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono, IBM_Plex_Serif } from "next/font/google";
-import "./globals.css";
+import { notFound } from "next/navigation";
+import "../globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ConsentBanner } from "@/components/layout/ConsentBanner";
-import { site } from "@/content/site";
+import { LocaleProvider } from "@/components/i18n/LocaleProvider";
+import { getDictionary } from "@/content/dictionaries";
+import { hasLocale, locales } from "@/content/locales";
 
 const plexSans = IBM_Plex_Sans({
   variable: "--font-plex-sans",
@@ -29,30 +32,49 @@ const plexSerif = IBM_Plex_Serif({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: `${site.name} · ${site.tagline}`,
-    template: `%s · ${site.name}`,
-  },
-  description: site.description,
-  metadataBase: new URL(site.url),
-  openGraph: {
-    siteName: site.legalName,
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-  },
-};
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }));
+}
 
-export default function RootLayout({
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  if (!hasLocale(lang)) return {};
+  const { site } = await getDictionary(lang);
+  return {
+    title: {
+      default: `${site.name} · ${site.tagline}`,
+      template: `%s · ${site.name}`,
+    },
+    description: site.description,
+    metadataBase: new URL(site.url),
+    openGraph: {
+      siteName: site.legalName,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }>) {
+  const { lang } = await params;
+  if (!hasLocale(lang)) notFound();
+  const dict = await getDictionary(lang);
+
   return (
     <html
-      lang="en"
+      lang={lang}
       className={`${plexSans.variable} ${plexMono.variable} ${plexSerif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
@@ -62,12 +84,14 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <Navbar />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <Footer />
-        <ConsentBanner />
+        <LocaleProvider dict={dict} lang={lang}>
+          <Navbar />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <Footer />
+          <ConsentBanner />
+        </LocaleProvider>
       </body>
     </html>
   );

@@ -7,7 +7,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Counter } from "@/components/ui/Counter";
 import { Globe } from "@/components/three/Globe";
 import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
-import { hero, monitor, stats } from "@/content/site";
+import { useContent } from "@/components/i18n/LocaleProvider";
 import {
   MONITOR_SITES,
   formatLonLat,
@@ -117,6 +117,7 @@ const fadeUp = {
 };
 
 export function Hero() {
+  const { hero, monitor, stats } = useContent();
   const reduce = useReducedMotion();
 
   // Cycle the six Brazil biomes; hubs and overseas sites stay static on the globe.

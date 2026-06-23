@@ -4,14 +4,18 @@ import { PageHero } from "@/components/ui/PageHero";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
-import { leadershipPage } from "@/content/about";
+import { getDictionary } from "@/content/dictionaries";
+import type { Locale } from "@/content/locales";
 
-export const metadata: Metadata = {
-  title: "Leadership",
-  description: leadershipPage.hero.body,
-};
-
-const { hero, executive, team } = leadershipPage;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const { leadershipPage } = await getDictionary(lang as Locale);
+  return { title: "Leadership", description: leadershipPage.hero.body };
+}
 
 /** Territory (green) → Science (blue) accent ramp — one tone per person, in order. */
 const ACCENT = [
@@ -35,7 +39,14 @@ function TierHeader({ label }: { label: string }) {
   );
 }
 
-export default function LeadershipPage() {
+export default async function LeadershipPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const { leadershipPage } = await getDictionary(lang as Locale);
+  const { hero, executive, team } = leadershipPage;
   return (
     <>
       <PageHero eyebrow={hero.eyebrow} headline={hero.headline} body={hero.body} />

@@ -3,14 +3,26 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
 import { EcosystemOrbit } from "@/components/ecosystem/EcosystemOrbit";
-import { ecosystemPage } from "@/content/ecosystem";
+import { getDictionary } from "@/content/dictionaries";
+import type { Locale } from "@/content/locales";
 
-export const metadata: Metadata = {
-  title: "Ecosystem",
-  description: ecosystemPage.hero.body,
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const { ecosystemPage } = await getDictionary(lang as Locale);
+  return { title: "Ecosystem", description: ecosystemPage.hero.body };
+}
 
-export default function EcosystemPage() {
+export default async function EcosystemPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const { ecosystemPage } = await getDictionary(lang as Locale);
   return (
     <>
       <PageHero {...ecosystemPage.hero} />

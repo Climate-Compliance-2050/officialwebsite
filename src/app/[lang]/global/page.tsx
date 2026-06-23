@@ -11,16 +11,26 @@ import { PipelineGrid } from "@/components/global/PipelineGrid";
 import { TypeLegend } from "@/components/global/TypeLegend";
 import { SectionNav } from "@/components/global/SectionNav";
 import { WorldInstrument } from "@/components/global/WorldInstrument";
-import { globalPage } from "@/content/global";
+import { getDictionary } from "@/content/dictionaries";
+import type { Locale } from "@/content/locales";
 
-const g = globalPage;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const { globalPage } = await getDictionary(lang as Locale);
+  return { title: "Global Carbon Markets", description: globalPage.hero.body };
+}
 
-export const metadata: Metadata = {
-  title: "Global Carbon Markets",
-  description: g.hero.body,
-};
-
-export default function GlobalPage() {
+export default async function GlobalPage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const { globalPage: g } = await getDictionary(lang as Locale);
   return (
     <>
       <PageHero

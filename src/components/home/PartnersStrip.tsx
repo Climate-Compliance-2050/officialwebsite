@@ -1,6 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
+import { LocaleLink } from "@/components/i18n/LocaleLink";
 
 const partners = [
   { name: "GEAP", src: "/partners/geap.webp" },
@@ -33,9 +33,9 @@ export function PartnersStrip() {
         </Reveal>
         <Reveal delay={0.12}>
           <p className="mt-8 text-center text-sm text-navy-900/55">
-            <Link href="/partners" className="font-medium text-blue-600 hover:text-blue-700">
+            <LocaleLink href="/partners" className="font-medium text-blue-600 hover:text-blue-700">
               Meet our partners →
-            </Link>
+            </LocaleLink>
           </p>
         </Reveal>
       </div>
