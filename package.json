@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NODE_OPTIONS=--max-old-space-size=4096 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -30,6 +30,7 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.184.1",
     "@types/topojson-client": "^3.1.5",
+    "cross-env": "^10.1.0",
     "docx": "^9.7.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
