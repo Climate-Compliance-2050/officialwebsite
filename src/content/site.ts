@@ -253,8 +253,9 @@ export const footer = {
     },
   ],
   legal: [
-    { label: "Code of Ethics", href: "/code-of-ethics" },
-    { label: "Privacy Policy", href: "/privacy-policy" },
+    { label: "Code of Conduct", href: "/documents/code-of-conduct.pdf", external: true },
+    { label: "Terms of Use", href: "/documents/terms-of-use.pdf", external: true },
+    { label: "Privacy Policy", href: "/documents/privacy-policy.pdf", external: true },
   ],
   disclaimer:
     "C2050 is not a carbon standard, registry, broker, verification and validation body, or investment adviser. C2050 provides decision-support intelligence and compliance infrastructure.",
@@ -268,9 +269,9 @@ export const consent = {
   message:
     "C2050 uses only the essential cookies the site needs to function. We set no advertising or tracking cookies. Continuing to browse confirms you accept this and our policies below.",
   accept: "Accept",
-  // Extend this array as the Cookie Policy / Terms of Use pages go live.
   links: [
-    { label: "Privacy Policy", href: "/privacy-policy" },
-    { label: "Code of Ethics", href: "/code-of-ethics" },
+    { label: "Privacy Policy", href: "/documents/privacy-policy.pdf", external: true },
+    { label: "Code of Conduct", href: "/documents/code-of-conduct.pdf", external: true },
+    { label: "Terms of Use", href: "/documents/terms-of-use.pdf", external: true },
   ],
 };

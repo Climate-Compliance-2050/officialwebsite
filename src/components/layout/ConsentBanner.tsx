@@ -57,12 +57,23 @@ export function ConsentBanner() {
                 {consent.links.map((link, i) => (
                   <span key={link.href}>
                     {i > 0 && <span aria-hidden> · </span>}
-                    <LocaleLink
-                      href={link.href}
-                      className="nav-underline text-white/80 transition-colors hover:text-green-400"
-                    >
-                      {link.label}
-                    </LocaleLink>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="nav-underline text-white/80 transition-colors hover:text-green-400"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <LocaleLink
+                        href={link.href}
+                        className="nav-underline text-white/80 transition-colors hover:text-green-400"
+                      >
+                        {link.label}
+                      </LocaleLink>
+                    )}
                   </span>
                 ))}
               </span>

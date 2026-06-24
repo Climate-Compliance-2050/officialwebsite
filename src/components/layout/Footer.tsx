@@ -90,15 +90,27 @@ export function Footer() {
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-white/60">{footer.copyright}</p>
           <div className="flex gap-6">
-            {footer.legal.map((link) => (
-              <LocaleLink
-                key={link.href}
-                href={link.href}
-                className="text-xs text-white/60 transition-colors hover:text-white/90"
-              >
-                {link.label}
-              </LocaleLink>
-            ))}
+            {footer.legal.map((link) =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-white/60 transition-colors hover:text-white/90"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <LocaleLink
+                  key={link.href}
+                  href={link.href}
+                  className="text-xs text-white/60 transition-colors hover:text-white/90"
+                >
+                  {link.label}
+                </LocaleLink>
+              )
+            )}
           </div>
         </div>
       </div>
