@@ -13,7 +13,7 @@ export const site = {
   description:
     "C2050 integrates geospatial, scientific, technical, legal and regulatory intelligence to assess, structure and monitor environmental assets, starting with carbon credits, emission reductions and removals.",
   url: "https://www.c2050.com",
-  linkedin: "https://www.linkedin.com/company/climatecompliance2050",
+  linkedin: "https://www.linkedin.com/company/climate-compliance-2050/posts/?feedView=all",
 };
 
 export const nav = {

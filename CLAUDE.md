@@ -1,5 +1,11 @@
 @AGENTS.md
 
+## Shorthand commands
+
+**"lança essa bomba"** — commit all staged changes and push to `main` on `https://github.com/Climate-Compliance-2050/officialwebsite`. No confirmation needed.
+
+---
+
 # C2050 — working agreement
 
 This file governs how AI assistants work in this repo. It is loaded every session.
