@@ -7,7 +7,7 @@
  */
 
 export const site = {
-  name: "C2050",
+  name: "C2050 - Climate Compliance 2050",
   legalName: "Climate Compliance 2050",
   tagline: "Global intelligence infrastructure for environmental asset integrity.",
   description:

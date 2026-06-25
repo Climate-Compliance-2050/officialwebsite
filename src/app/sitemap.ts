@@ -30,7 +30,7 @@ const routes: Array<{ path: string; priority: number; changeFrequency: MetadataR
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   return routes.map(({ path, priority, changeFrequency }) => ({
-    url: path ? `${base}/en/${path}` : `${base}/en`,
+    url: path ? `${base}/${path}` : base,
     lastModified,
     changeFrequency,
     priority,

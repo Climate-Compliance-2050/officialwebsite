@@ -22,5 +22,7 @@ export function withLang(href: string, lang: string): string {
   // Only internal absolute paths get prefixed. Leaves "#", "mailto:", "https://",
   // "//cdn…" and already-relative hrefs alone.
   if (!href.startsWith("/") || href.startsWith("//")) return href;
+  // Default locale uses clean URLs — the proxy rewrites internally.
+  if (lang === "en") return href;
   return `/${lang}${href}`;
 }

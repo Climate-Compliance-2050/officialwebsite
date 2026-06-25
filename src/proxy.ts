@@ -2,10 +2,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { locales, defaultLocale } from "@/content/locales";
 
 /**
- * Locale redirect (Next.js 16 `proxy` convention — the renamed `middleware`).
- * Unprefixed requests are sent to `/{locale}{path}`, choosing the locale from
- * the `NEXT_LOCALE` cookie (set by the nav toggle), then `Accept-Language`,
- * then the default.
+ * Locale proxy (Next.js 16 `proxy` convention — the renamed `middleware`).
+ * Rewrites unprefixed URLs to `/{locale}{path}` internally — the browser URL
+ * stays clean (no /en/ prefix). Locale chosen from NEXT_LOCALE cookie →
+ * Accept-Language → defaultLocale.
+ *
+ * Direct /en/ or /pt/ requests still work (e.g. locale toggle links).
  */
 function getLocale(request: NextRequest): string {
   const cookie = request.cookies.get("NEXT_LOCALE")?.value;
@@ -32,7 +34,7 @@ export function proxy(request: NextRequest) {
 
   const locale = getLocale(request);
   request.nextUrl.pathname = `/${locale}${pathname}`;
-  return NextResponse.redirect(request.nextUrl);
+  return NextResponse.rewrite(request.nextUrl);
 }
 
 export const config = {

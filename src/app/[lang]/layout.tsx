@@ -57,6 +57,9 @@ export async function generateMetadata({
         "msvalidate.01": "F197987F60CEA97176E86581B096D094",
       },
     },
+    ...(lang !== "en" && {
+      robots: { index: false, follow: false },
+    }),
     openGraph: {
       siteName: site.legalName,
       type: "website",
