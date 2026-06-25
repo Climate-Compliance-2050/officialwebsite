@@ -53,6 +53,9 @@ export async function generateMetadata({
     metadataBase: new URL(site.url),
     verification: {
       google: "3Dcu1Nxl_2YT8tg5BTNOPyOpnNfBG0paQ9jzQWgGkDw",
+      other: {
+        "msvalidate.01": "F197987F60CEA97176E86581B096D094",
+      },
     },
     openGraph: {
       siteName: site.legalName,
