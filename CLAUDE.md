@@ -34,6 +34,8 @@ This repo is built with Claude Opus 4.8 / Fable 5. Don't under-drive them.
   `src/content/*` or a cited source. If you don't have it, say so — never fabricate.
 
 ---
+## Plan First
+For any design/UX or visual feature, propose 2-3 concrete options and wait for my pick before implementing.
 
 ## 2. No AI slop, no clichés
 
