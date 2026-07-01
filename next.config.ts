@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
     removeConsole: { exclude: ["error"] },
   },
 
+  // Tree-shake big barrel packages so only used modules ship (lucide-react is
+  // already optimized by default). Trims framer-motion and drei import weight.
+  experimental: {
+    optimizePackageImports: ["framer-motion", "@react-three/drei"],
+  },
+
   async headers() {
     const securityHeaders = [
       // Block other origins from framing the site (clickjacking + content theft).

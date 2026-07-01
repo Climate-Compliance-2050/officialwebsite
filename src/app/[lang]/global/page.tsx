@@ -11,6 +11,7 @@ import { PipelineGrid } from "@/components/global/PipelineGrid";
 import { TypeLegend } from "@/components/global/TypeLegend";
 import { SectionNav } from "@/components/global/SectionNav";
 import { WorldInstrument } from "@/components/global/WorldInstrument";
+import { WORLD_LAND_PATH } from "@/content/worldGeo";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
 
@@ -37,6 +38,7 @@ export default async function GlobalPage({
         {...g.hero}
         backdrop={
           <WorldInstrument
+            landPath={WORLD_LAND_PATH}
             fit="slice"
             tone="hero"
             labels={false}

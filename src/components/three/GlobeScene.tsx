@@ -1,7 +1,25 @@
 "use client";
 
 import { Suspense, useMemo, useRef } from "react";
-import * as THREE from "three";
+import {
+  AdditiveBlending,
+  BufferAttribute,
+  BufferGeometry,
+  ClampToEdgeWrapping,
+  Color,
+  DoubleSide,
+  Group,
+  LinearFilter,
+  Mesh,
+  MeshBasicMaterial,
+  NoColorSpace,
+  Object3D,
+  Quaternion,
+  RepeatWrapping,
+  ShaderMaterial,
+  TextureLoader,
+  Vector3,
+} from "three";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
 import { useReducedMotion } from "framer-motion";
@@ -13,13 +31,13 @@ const SCAN_SPEED = 0.12;
 /** latitude survey band advance, rad/s — secondary scan axis */
 const SCAN_LAT_SPEED = 0.07;
 const DEG = Math.PI / 180;
-const Y_AXIS = new THREE.Vector3(0, 1, 0);
-const X_AXIS = new THREE.Vector3(1, 0, 0);
+const Y_AXIS = new Vector3(0, 1, 0);
+const X_AXIS = new Vector3(1, 0, 0);
 
-function lonLatToVec3(lon: number, lat: number, r = RADIUS): THREE.Vector3 {
+function lonLatToVec3(lon: number, lat: number, r = RADIUS): Vector3 {
   const phi = (90 - lat) * (Math.PI / 180);
   const theta = (lon + 180) * (Math.PI / 180);
-  return new THREE.Vector3(
+  return new Vector3(
     -r * Math.sin(phi) * Math.cos(theta),
     r * Math.cos(phi),
     r * Math.sin(phi) * Math.sin(theta),
@@ -27,12 +45,12 @@ function lonLatToVec3(lon: number, lat: number, r = RADIUS): THREE.Vector3 {
 }
 
 /** Orientation that slews a given lon/lat to face the camera (front, +Z), lifted just above centre. */
-function targetQuat(lon: number, lat: number): THREE.Quaternion {
+function targetQuat(lon: number, lat: number): Quaternion {
   const theta = (lon + 180) * DEG;
   const beta = Math.PI / 2 - theta; // yaw: bring the meridian to the camera
   const gamma = lat * DEG - 0.05; // pitch: bring the latitude to screen centre (slight lift)
-  const qYaw = new THREE.Quaternion().setFromAxisAngle(Y_AXIS, beta);
-  const qPitch = new THREE.Quaternion().setFromAxisAngle(X_AXIS, gamma);
+  const qYaw = new Quaternion().setFromAxisAngle(Y_AXIS, beta);
+  const qPitch = new Quaternion().setFromAxisAngle(X_AXIS, gamma);
   return qPitch.multiply(qYaw); // yaw first, then pitch (world axes)
 }
 
@@ -168,19 +186,19 @@ const surveyFragment = /* glsl */ `
 `;
 
 /** Opaque survey sphere — also the depth occluder for far-side markers/labels. */
-function SurveySphere({ meshRef }: { meshRef: React.RefObject<THREE.Mesh | null> }) {
-  const sdf = useLoader(THREE.TextureLoader, "/globe/land-sdf.png");
+function SurveySphere({ meshRef }: { meshRef: React.RefObject<Mesh | null> }) {
+  const sdf = useLoader(TextureLoader, "/globe/land-sdf.png");
 
   const material = useMemo(() => {
     const tex = sdf.clone();
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.ClampToEdgeWrapping;
-    tex.minFilter = THREE.LinearFilter;
-    tex.magFilter = THREE.LinearFilter;
+    tex.wrapS = RepeatWrapping;
+    tex.wrapT = ClampToEdgeWrapping;
+    tex.minFilter = LinearFilter;
+    tex.magFilter = LinearFilter;
     tex.generateMipmaps = false;
-    tex.colorSpace = THREE.NoColorSpace;
+    tex.colorSpace = NoColorSpace;
     tex.needsUpdate = true;
-    return new THREE.ShaderMaterial({
+    return new ShaderMaterial({
       uniforms: {
         uSdf: { value: tex },
         uScan: { value: -0.9 }, // sweep starts over the Amazon
@@ -205,11 +223,11 @@ function SurveySphere({ meshRef }: { meshRef: React.RefObject<THREE.Mesh | null>
 function Rim() {
   const material = useMemo(
     () =>
-      new THREE.ShaderMaterial({
+      new ShaderMaterial({
         transparent: true,
         depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        uniforms: { uColor: { value: new THREE.Color("#317ec0") } },
+        blending: AdditiveBlending,
+        uniforms: { uColor: { value: new Color("#317ec0") } },
         vertexShader: /* glsl */ `
           varying vec3 vNormal;
           varying vec3 vView;
@@ -248,8 +266,8 @@ function bracketGeometry(s: number, arm: number) {
       pts.push(sx * s, sy * s, 0, sx * s, sy * (s - arm), 0);
     }
   }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pts), 3));
+  const geo = new BufferGeometry();
+  geo.setAttribute("position", new BufferAttribute(new Float32Array(pts), 3));
   return geo;
 }
 
@@ -258,7 +276,7 @@ const SITE_BRACKET = bracketGeometry(0.029, 0.012);
 
 /** Radar-style ping on the coordinate the inspector is currently reading. */
 function ActivePing({ reduce }: { reduce: boolean | null }) {
-  const ref = useRef<THREE.Mesh>(null);
+  const ref = useRef<Mesh>(null);
   useFrame((state) => {
     const mesh = ref.current;
     if (!mesh) return;
@@ -266,12 +284,12 @@ function ActivePing({ reduce }: { reduce: boolean | null }) {
     const t = reduce ? 0.0 : (state.clock.elapsedTime % 2) / 2;
     const s = 1 + t * 1.9;
     mesh.scale.set(s, s, s);
-    (mesh.material as THREE.MeshBasicMaterial).opacity = (1 - t) * 0.55;
+    (mesh.material as MeshBasicMaterial).opacity = (1 - t) * 0.55;
   });
   return (
     <mesh ref={ref}>
       <ringGeometry args={[0.03, 0.038, 40]} />
-      <meshBasicMaterial color="#3fdf85" transparent depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial color="#3fdf85" transparent depthWrite={false} side={DoubleSide} />
     </mesh>
   );
 }
@@ -282,7 +300,7 @@ function Marker({
   active,
   reduce,
 }: {
-  position: THREE.Vector3;
+  position: Vector3;
   hub?: boolean;
   active?: boolean;
   reduce?: boolean | null;
@@ -291,8 +309,8 @@ function Marker({
   const color = active || hub ? "#3fdf85" : "#8ecdf2";
   const bracket = active || hub ? HUB_BRACKET : SITE_BRACKET;
   const normal = position.clone().normalize();
-  const quaternion = new THREE.Quaternion().setFromUnitVectors(
-    new THREE.Vector3(0, 0, 1),
+  const quaternion = new Quaternion().setFromUnitVectors(
+    new Vector3(0, 0, 1),
     normal,
   );
 
@@ -307,7 +325,7 @@ function Marker({
             transparent
             opacity={0.5}
             depthWrite={false}
-            side={THREE.DoubleSide}
+            side={DoubleSide}
           />
         </mesh>
       )}
@@ -316,7 +334,7 @@ function Marker({
       </lineSegments>
       <mesh>
         <circleGeometry args={[active ? 0.009 : hub ? 0.008 : 0.006, 16]} />
-        <meshBasicMaterial color={color} side={THREE.DoubleSide} />
+        <meshBasicMaterial color={color} side={DoubleSide} />
       </mesh>
     </group>
   );
@@ -329,14 +347,14 @@ function SiteLabel({
   occludeRef,
 }: {
   name: string;
-  position: THREE.Vector3;
-  occludeRef: React.RefObject<THREE.Mesh | null>;
+  position: Vector3;
+  occludeRef: React.RefObject<Mesh | null>;
 }) {
   return (
     <Html
       position={position}
       center
-      occlude={[occludeRef as React.RefObject<THREE.Object3D>]}
+      occlude={[occludeRef as React.RefObject<Object3D>]}
       zIndexRange={[10, 0]}
       wrapperClass="pointer-events-none"
     >
@@ -354,8 +372,8 @@ function GlobeGroup({
   interacting: React.RefObject<boolean>;
   activeIndex?: number;
 }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const occluderRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<Group>(null);
+  const occluderRef = useRef<Mesh>(null);
   const settled = useRef(false);
   const reduce = useReducedMotion();
 
@@ -384,7 +402,7 @@ function GlobeGroup({
     }
     if (reduce) return;
     // Both scan axes keep sweeping even while the user drags.
-    const mat = occluderRef.current?.material as THREE.ShaderMaterial | undefined;
+    const mat = occluderRef.current?.material as ShaderMaterial | undefined;
     if (mat?.uniforms?.uScan) mat.uniforms.uScan.value += delta * SCAN_SPEED;
     if (mat?.uniforms?.uScanLat) mat.uniforms.uScanLat.value += delta * SCAN_LAT_SPEED;
   });
@@ -417,14 +435,26 @@ function GlobeGroup({
   );
 }
 
-export default function GlobeScene({ activeIndex }: { activeIndex?: number }) {
+export default function GlobeScene({
+  activeIndex,
+  visible = true,
+}: {
+  activeIndex?: number;
+  visible?: boolean;
+}) {
   const interacting = useRef(false);
+  const reduce = useReducedMotion();
+
+  // Don't burn GPU when the globe is offscreen; under reduced motion the scene
+  // is static, so render on demand (mount + prop changes) instead of 60fps.
+  const frameloop = !visible ? "never" : reduce ? "demand" : "always";
 
   return (
     <Canvas
-      dpr={[1, 2]}
+      frameloop={frameloop}
+      dpr={[1, 1.5]}
       camera={{ position: [0, 0, 3.55], fov: 45 }}
-      gl={{ alpha: true, antialias: true }}
+      gl={{ alpha: true, antialias: false }}
       aria-hidden
       className="!touch-pan-y"
     >

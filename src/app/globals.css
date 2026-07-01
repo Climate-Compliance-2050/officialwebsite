@@ -62,10 +62,24 @@
   /* ---- brand mark (aperture) lens rotation: very slow, ambient ---- */
   --animate-spin-slow: spin-slow 120s linear infinite;
   --animate-spin-slower: spin-slow 200s linear infinite reverse;
+  /* hero aperture watermark — was a framer-motion rAF loop; CSS so it costs no JS */
+  --animate-aperture: spin-slow 220s linear infinite;
 
   @keyframes spin-slow {
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  /* ---- world survey instrument: longitude sweep (SVG user units) ---- */
+  --animate-sweep-x: sweep-x 11s linear infinite;
+
+  @keyframes sweep-x {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(360px);
     }
   }
 

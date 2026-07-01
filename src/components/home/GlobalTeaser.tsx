@@ -6,6 +6,7 @@ import { SurveyBackdrop } from "@/components/ui/SurveyBackdrop";
 import { WorldInstrument } from "@/components/global/WorldInstrument";
 import { useContent } from "@/components/i18n/LocaleProvider";
 import { typeColor } from "@/content/global";
+import { WORLD_LAND_PATH } from "@/content/worldGeo";
 
 /* ------------------------------------------------------------------ *
  * Global teaser — the real-coastline survey basemap (WorldInstrument)
@@ -21,7 +22,7 @@ type LegendTypes = ReturnType<typeof useContent>["globalPage"]["legend"]["types"
 function WorldMap({ teaser, legendTypes }: { teaser: Teaser; legendTypes: LegendTypes }) {
   return (
     <div className="corners corners-faint relative aspect-[360/134] w-full overflow-hidden border border-white/10 bg-navy-950/40">
-      <WorldInstrument className="h-full w-full" tone="panel" />
+      <WorldInstrument landPath={WORLD_LAND_PATH} className="h-full w-full" tone="panel" />
 
       {/* coverage readout, anchored low-left like a HUD */}
       <div className="pointer-events-none absolute bottom-3 left-3">

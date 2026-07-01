@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ButtonLink } from "@/components/ui/Button";
@@ -120,18 +120,34 @@ export function Hero() {
   const { hero, monitor, stats } = useContent();
   const reduce = useReducedMotion();
 
-  // Cycle the six Brazil biomes; hubs and overseas sites stay static on the globe.
+  // Cycle the eight survey jurisdictions; hubs and static sites stay put on the globe.
   const inspectable = useMemo(
-    () => MONITOR_SITES.map((site, index) => ({ site, index })).filter((s) => s.site.biome),
+    () => MONITOR_SITES.map((site, index) => ({ site, index })).filter((s) => s.site.survey),
     [],
   );
   const [step, setStep] = useState(0);
 
+  // Pause the survey cycle (and the globe's render loop) while the console is
+  // scrolled out of view — no work for an off-screen instrument.
+  const consoleRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(true);
+
   useEffect(() => {
-    if (reduce) return;
+    const el = consoleRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { rootMargin: "100px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (reduce || !visible) return;
     const id = setInterval(() => setStep((n) => (n + 1) % inspectable.length), DWELL);
     return () => clearInterval(id);
-  }, [reduce, inspectable.length]);
+  }, [reduce, visible, inspectable.length]);
 
   const active = inspectable[step];
 
@@ -140,21 +156,22 @@ export function Hero() {
       {/* backdrop: graticule + corner ticks — quiet, technical */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <SurveyBackdrop ticks />
-        {/* aperture watermark — the C2050 lens, slow ambient rotation */}
-        <motion.div
-          className="absolute -right-24 top-1/2 h-[44rem] w-[44rem] -translate-y-1/2 opacity-[0.04]"
-          animate={reduce ? undefined : { rotate: 360 }}
-          transition={reduce ? undefined : { duration: 220, ease: "linear", repeat: Infinity }}
-        >
-          <Image
-            src="/brand/mark-white.webp"
-            alt=""
-            fill
-            sizes="44rem"
-            className="object-contain"
-            priority={false}
-          />
-        </motion.div>
+        {/* aperture watermark — the C2050 lens, slow ambient rotation.
+            CSS keyframe (animate-aperture) instead of a framer-motion rAF loop;
+            rotation lives on an inner div so it doesn't clobber the -translate-y-1/2
+            centering. Reduced motion is handled by the global CSS rule. */}
+        <div className="absolute -right-24 top-1/2 h-[44rem] w-[44rem] -translate-y-1/2 opacity-[0.04]">
+          <div className="relative h-full w-full animate-aperture">
+            <Image
+              src="/brand/mark-white.webp"
+              alt=""
+              fill
+              sizes="44rem"
+              className="object-contain"
+              priority={false}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="relative mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-28 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-6 lg:px-8 lg:pb-24 lg:pt-36">
@@ -214,6 +231,7 @@ export function Hero() {
 
         {/* Global Asset Monitor console */}
         <motion.div
+          ref={consoleRef}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.35, ease: [0.21, 0.65, 0.36, 1] }}
@@ -232,7 +250,7 @@ export function Hero() {
 
             {/* globe viewport — its active marker tracks the inspector */}
             <div className="relative aspect-square">
-              <Globe activeIndex={active.index} />
+              <Globe activeIndex={active.index} visible={visible} />
               {/* brand attribution — quiet corner stamp */}
               <span className="pointer-events-none absolute bottom-2.5 left-3 z-10 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-white/45">
                 <Image
@@ -247,7 +265,7 @@ export function Hero() {
               </span>
             </div>
 
-            {/* biome survey rail — six ticks, the cycle made visible */}
+            {/* survey rail — one tick per jurisdiction, the cycle made visible */}
             <div className="flex items-center gap-2.5 border-t border-white/10 px-4 py-2">
               <span className="tnum shrink-0 font-mono text-[10px] text-white/55">
                 {String(step + 1).padStart(2, "0")}/{String(inspectable.length).padStart(2, "0")}

@@ -58,7 +58,7 @@ export const hero = {
 /** Hero "Global Asset Monitor" console chrome. */
 export const monitor = {
   title: "Global Asset Monitor",
-  survey: "Survey · Brazil · 6 biomes",
+  survey: "Survey · global · 8 sites",
 };
 
 /** Survey datum labels etched into dark-section backdrops — the two operational hubs. */

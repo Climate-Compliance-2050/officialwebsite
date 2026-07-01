@@ -1,8 +1,7 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import {
-  WORLD_LAND_PATH,
   WORLD_VIEWBOX,
   WORLD_VIEWBOX_STR,
   lonToX,
@@ -65,6 +64,12 @@ const PARALLELS: number[] = [];
 for (let lat = 60; lat >= -40; lat -= 20) PARALLELS.push(latToY(lat));
 
 type Props = {
+  /**
+   * Natural Earth land silhouette (worldGeo WORLD_LAND_PATH), ~54KB. Passed in
+   * rather than imported so a Server-Component parent can deliver it via the RSC
+   * flight payload — keeping the string out of this client component's JS bundle.
+   */
+  landPath: string;
   /** "slice" fills (full-bleed hero); "meet" fits (framed teaser panel). */
   fit?: "meet" | "slice";
   /** Render anchor reticle labels. */
@@ -77,6 +82,7 @@ type Props = {
 };
 
 export function WorldInstrument({
+  landPath,
   fit = "meet",
   labels = true,
   animate = true,
@@ -110,7 +116,7 @@ export function WorldInstrument({
 
       {/* real coastlines */}
       <path
-        d={WORLD_LAND_PATH}
+        d={landPath}
         fillRule="evenodd"
         fill={`rgba(255,255,255,${fill})`}
         stroke={`rgba(255,255,255,${land})`}
@@ -118,16 +124,14 @@ export function WorldInstrument({
         strokeLinejoin="round"
       />
 
-      {/* longitude survey sweep */}
+      {/* longitude survey sweep — CSS keyframe (no rAF); motionOn still drops it under reduced motion */}
       {motionOn && (
-        <motion.line
+        <line
+          className="animate-sweep-x"
           y1={y + 2}
           y2={y + h - 2}
           stroke="rgba(101,196,123,0.4)"
           strokeWidth={0.7}
-          initial={{ x: 0 }}
-          animate={{ x: 360 }}
-          transition={{ duration: 11, ease: "linear", repeat: Infinity }}
         />
       )}
 
