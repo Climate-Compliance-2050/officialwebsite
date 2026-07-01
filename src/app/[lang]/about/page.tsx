@@ -8,6 +8,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { MissionVision } from "@/components/home/MissionVision";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
+import { site } from "@/content/site";
 
 export async function generateMetadata({
   params,
@@ -16,7 +17,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const { aboutPage } = await getDictionary(lang as Locale);
-  return { title: "About Us", description: aboutPage.hero.body };
+  return {
+    title: "About Us",
+    description: aboutPage.hero.body,
+    alternates: { canonical: `${site.url}/en/about` },
+  };
 }
 
 // Evidence registers: the data inputs every assessed asset is built on.

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
 import { Problem } from "@/components/home/Problem";
 import { DataCubeStack } from "@/components/home/DataCubeStack";
@@ -7,6 +8,11 @@ import { GlobalTeaser } from "@/components/home/GlobalTeaser";
 import { ClarifierBanner } from "@/components/home/ClarifierBanner";
 import { PartnersStrip } from "@/components/home/PartnersStrip";
 import { HomeCta } from "@/components/home/HomeCta";
+import { site } from "@/content/site";
+
+export function generateMetadata(): Metadata {
+  return { alternates: { canonical: `${site.url}/en` } };
+}
 
 export default function HomePage() {
   return (

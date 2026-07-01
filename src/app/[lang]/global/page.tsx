@@ -14,6 +14,7 @@ import { WorldInstrument } from "@/components/global/WorldInstrument";
 import { WORLD_LAND_PATH } from "@/content/worldGeo";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
+import { site } from "@/content/site";
 
 export async function generateMetadata({
   params,
@@ -22,7 +23,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const { globalPage } = await getDictionary(lang as Locale);
-  return { title: "Global Carbon Markets", description: globalPage.hero.body };
+  return {
+    title: "Global Carbon Markets",
+    description: globalPage.hero.body,
+    alternates: { canonical: `${site.url}/en/global` },
+  };
 }
 
 export default async function GlobalPage({

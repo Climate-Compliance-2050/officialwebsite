@@ -5,6 +5,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { EcosystemOrbit } from "@/components/ecosystem/EcosystemOrbit";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
+import { site } from "@/content/site";
 
 export async function generateMetadata({
   params,
@@ -13,7 +14,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const { ecosystemPage } = await getDictionary(lang as Locale);
-  return { title: "Ecosystem", description: ecosystemPage.hero.body };
+  return {
+    title: "Ecosystem",
+    description: ecosystemPage.hero.body,
+    alternates: { canonical: `${site.url}/en/ecosystem` },
+  };
 }
 
 export default async function EcosystemPage({

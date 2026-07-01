@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { LicensingStudio } from "@/components/products/LicensingStudio";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
+import { site } from "@/content/site";
 
 export async function generateMetadata({
   params,
@@ -15,7 +16,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const { productsPage } = await getDictionary(lang as Locale);
-  return { title: "Products", description: productsPage.hero.body };
+  return {
+    title: "Products",
+    description: productsPage.hero.body,
+    alternates: { canonical: `${site.url}/en/products` },
+  };
 }
 
 export default async function ProductsPage({

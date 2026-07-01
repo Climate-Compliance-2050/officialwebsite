@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { StudiesFunnel } from "@/components/services/StudiesFunnel";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
+import { site } from "@/content/site";
 
 export async function generateMetadata({
   params,
@@ -15,7 +16,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const { servicesPage } = await getDictionary(lang as Locale);
-  return { title: "Services", description: servicesPage.hero.body };
+  return {
+    title: "Services",
+    description: servicesPage.hero.body,
+    alternates: { canonical: `${site.url}/en/services` },
+  };
 }
 
 /** Aperture/lens styling per discipline tone. Static class strings (Tailwind-safe). */

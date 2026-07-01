@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { PageHero } from "@/components/ui/PageHero";
 import { LocaleLink } from "@/components/i18n/LocaleLink";
+import { site } from "@/content/site";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "How C2050 collects, uses and protects personal data.",
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: "Privacy Policy",
+    description: "How C2050 collects, uses and protects personal data.",
+    alternates: { canonical: `${site.url}/en/privacy-policy` },
+  };
+}
 
 export default function PrivacyPolicyPage() {
   return (

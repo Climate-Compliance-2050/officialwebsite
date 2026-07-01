@@ -5,6 +5,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
+import { site } from "@/content/site";
 
 export async function generateMetadata({
   params,
@@ -13,7 +14,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const { contactPage } = await getDictionary(lang as Locale);
-  return { title: "Contact", description: contactPage.hero.body };
+  return {
+    title: "Contact",
+    description: contactPage.hero.body,
+    alternates: { canonical: `${site.url}/en/contact` },
+  };
 }
 
 export default async function ContactPage({

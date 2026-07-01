@@ -6,6 +6,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
+import { site } from "@/content/site";
 
 export async function generateMetadata({
   params,
@@ -14,7 +15,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const { partnersPage } = await getDictionary(lang as Locale);
-  return { title: "Partners", description: partnersPage.hero.body };
+  return {
+    title: "Partners",
+    description: partnersPage.hero.body,
+    alternates: { canonical: `${site.url}/en/partners` },
+  };
 }
 
 export default async function PartnersPage({
