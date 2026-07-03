@@ -260,6 +260,7 @@ export const footer = {
   disclaimer:
     "C2050 is not a carbon standard, registry, broker, verification and validation body, or investment adviser. C2050 provides decision-support intelligence and compliance infrastructure.",
   copyright: `© ${new Date().getFullYear()} Climate Compliance 2050. All rights reserved.`,
+  madeBy: "Made by Raul Barros",
 };
 
 export const consent = {

@@ -17,6 +17,8 @@ type Filter = { id: string; label: string };
 type Props = {
   studies: Study[];
   filters: Filter[];
+  /** Shown when the active filter matches no studies. */
+  empty: string;
 };
 
 /** Depth tiers, shallow → deep. Drives the core-sample rail and the per-card meter. */
@@ -52,7 +54,7 @@ function matches(study: Study, filter: string): boolean {
   }
 }
 
-export function StudiesFunnel({ studies, filters }: Props) {
+export function StudiesFunnel({ studies, filters, empty }: Props) {
   const [active, setActive] = useState("all");
   const reduce = useReducedMotion();
   const listRef = useRef<HTMLDivElement>(null);
@@ -236,7 +238,7 @@ export function StudiesFunnel({ studies, filters }: Props) {
 
           {visible.length === 0 && (
             <p className="rounded-sm border border-dashed border-navy-900/15 p-8 text-center text-sm text-navy-900/55">
-              No studies match that filter.
+              {empty}
             </p>
           )}
         </div>

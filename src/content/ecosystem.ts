@@ -227,6 +227,7 @@ export const servicesPage = {
     eyebrow: "The studies",
     headline: "Screen wide, then go deep.",
     body: "Nine studies along one funnel. Filter by who you are and how far you need to go — each can be requested directly.",
+    empty: "No studies match that filter.",
   },
   /** Filter predicates, single-select. Mirrors the funnel's two axes. */
   filters: [

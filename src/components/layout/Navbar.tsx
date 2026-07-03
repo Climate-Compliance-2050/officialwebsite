@@ -14,6 +14,48 @@ import { locales, type Locale } from "@/content/locales";
 // the toggle. See CLAUDE.md § "Internationalization (i18n) — paused".
 const SHOW_LOCALE_TOGGLE = false;
 
+function LocaleToggle({
+  lang,
+  overDark,
+  onSwitch,
+  className = "",
+}: {
+  lang: Locale;
+  overDark: boolean;
+  onSwitch: (target: Locale) => void;
+  className?: string;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label="Language"
+      className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.12em] ${className}`}
+    >
+      {locales.map((l, i) => (
+        <Fragment key={l}>
+          {i > 0 && <span className="opacity-40" aria-hidden>·</span>}
+          <button
+            type="button"
+            onClick={() => onSwitch(l)}
+            aria-current={l === lang ? "true" : undefined}
+            className={`cursor-pointer px-1 py-0.5 transition-colors ${
+              l === lang
+                ? overDark
+                  ? "text-white"
+                  : "text-blue-600"
+                : overDark
+                  ? "text-white/55 hover:text-white"
+                  : "text-navy-800/55 hover:text-blue-600"
+            }`}
+          >
+            {l}
+          </button>
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
 export function Navbar() {
   const { nav, site } = useContent();
   const lang = useLang();
@@ -68,36 +110,6 @@ export function Navbar() {
   const scheduleClose = () => {
     closeTimer.current = setTimeout(() => setOpenDropdown(null), 120);
   };
-
-  const LocaleToggle = ({ className = "" }: { className?: string }) => (
-    <div
-      role="group"
-      aria-label="Language"
-      className={`flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.12em] ${className}`}
-    >
-      {locales.map((l, i) => (
-        <Fragment key={l}>
-          {i > 0 && <span className="opacity-40" aria-hidden>·</span>}
-          <button
-            type="button"
-            onClick={() => switchLocale(l)}
-            aria-current={l === lang ? "true" : undefined}
-            className={`cursor-pointer px-1 py-0.5 transition-colors ${
-              l === lang
-                ? overDark
-                  ? "text-white"
-                  : "text-blue-600"
-                : overDark
-                  ? "text-white/55 hover:text-white"
-                  : "text-navy-800/55 hover:text-blue-600"
-            }`}
-          >
-            {l}
-          </button>
-        </Fragment>
-      ))}
-    </div>
-  );
 
   return (
     <header
@@ -202,12 +214,16 @@ export function Navbar() {
           >
             {nav.cta.label}
           </LocaleLink>
-          {SHOW_LOCALE_TOGGLE && <LocaleToggle className="ml-4 pl-1" />}
+          {SHOW_LOCALE_TOGGLE && (
+            <LocaleToggle lang={lang} overDark={overDark} onSwitch={switchLocale} className="ml-4 pl-1" />
+          )}
         </div>
 
         {/* Mobile: language + menu toggle */}
         <div className="flex items-center gap-2 lg:hidden">
-          {SHOW_LOCALE_TOGGLE && <LocaleToggle />}
+          {SHOW_LOCALE_TOGGLE && (
+            <LocaleToggle lang={lang} overDark={overDark} onSwitch={switchLocale} />
+          )}
           <button
             type="button"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}

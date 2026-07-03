@@ -116,7 +116,7 @@ export function Footer() {
           </div>
           {/* Built by Raul Barros */}
           <p className="mt-3 text-right font-mono text-[9px] uppercase tracking-widest text-white/20 transition-colors hover:text-white/40">
-            Made by Raul Barros
+            {footer.madeBy}
           </p>
         </div>
       </div>

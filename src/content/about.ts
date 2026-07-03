@@ -179,6 +179,16 @@ export const contactPage = {
     },
     message: { label: "Your message", placeholder: "Tell us about your project, asset or jurisdiction…" },
     submit: "Send message",
+    errors: {
+      required: "This field is required.",
+      email: "Enter a valid email address, e.g. you@company.com.",
+    },
+    status: {
+      sending: "Sending…",
+      sent: "Thank you! Your message is on its way.",
+      // The contact email is appended as a mailto link after this sentence.
+      error: "Something went wrong sending your message. Please retry, or email us directly at",
+    },
   },
   offices: [
     { city: "Dublin, Ireland", note: "Headquarters" },

@@ -24,6 +24,12 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["framer-motion", "@react-three/drei"],
   },
 
+  images: {
+    // Optimized variants of local static images can outlive the 4h default —
+    // sources never change under the same URL.
+    minimumCacheTTL: 2678400, // 31 days
+  },
+
   async headers() {
     const securityHeaders = [
       // Block other origins from framing the site (clickjacking + content theft).
@@ -38,7 +44,28 @@ const nextConfig: NextConfig = {
       },
     ];
 
-    return [{ source: "/:path*", headers: securityHeaders }];
+    // public/ files are not content-hashed, so "immutable" is a convention:
+    // when an asset changes, rename the file (e.g. earth-orbit-2.mp4) instead
+    // of replacing it in place, or returning visitors keep the old one for a year.
+    const immutableAssets = [
+      { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+    ];
+
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/video/:path*", headers: immutableAssets },
+      { source: "/images/:path*", headers: immutableAssets },
+      { source: "/globe/:path*", headers: immutableAssets },
+      { source: "/icons/:path*", headers: immutableAssets },
+      { source: "/brand/:path*", headers: immutableAssets },
+      {
+        // Legal PDFs may be replaced in place — short cache, always revalidate.
+        source: "/documents/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=3600, must-revalidate" },
+        ],
+      },
+    ];
   },
 };
 

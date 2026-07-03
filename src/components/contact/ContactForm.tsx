@@ -65,9 +65,9 @@ export function ContactForm() {
 
   const validateField = (name: string, value: string) => {
     let message = "";
-    if (!value.trim()) message = "This field is required.";
-    else if (name === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-      message = "Enter a valid email address, e.g. you@company.com.";
+    if (!value.trim()) message = form.errors.required;
+    else if (name === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()))
+      message = form.errors.email;
     setErrors((prev) => ({ ...prev, [name]: message }));
     return message === "";
   };
@@ -237,18 +237,16 @@ export function ContactForm() {
         className="btn-sheen inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-sm bg-green-500 px-7 py-3.5 text-base font-semibold text-white transition-all duration-200 hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/25 active:scale-[0.99] disabled:cursor-default disabled:opacity-60 sm:w-auto"
       >
         <Send className="h-4 w-4" aria-hidden />
-        {status === "sending" ? "Sending…" : form.submit}
+        {status === "sending" ? form.status.sending : form.submit}
       </button>
 
       <p aria-live="polite" className="text-sm">
         {status === "sent" && (
-          <span className="font-medium text-green-700">
-            Thank you! Your message is on its way.
-          </span>
+          <span className="font-medium text-green-700">{form.status.sent}</span>
         )}
         {status === "error" && (
           <span className="font-medium text-red-600">
-            Something went wrong sending your message. Please retry, or email us directly at{" "}
+            {form.status.error}{" "}
             <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
               {CONTACT_EMAIL}
             </a>

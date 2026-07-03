@@ -177,7 +177,11 @@ export default async function ServicesPage({
             align="left"
           />
           <div className="mt-12">
-            <StudiesFunnel studies={servicesPage.studies} filters={servicesPage.filters} />
+            <StudiesFunnel
+              studies={servicesPage.studies}
+              filters={servicesPage.filters}
+              empty={servicesPage.catalogue.empty}
+            />
           </div>
         </div>
       </section>

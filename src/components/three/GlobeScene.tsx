@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -212,6 +212,16 @@ function SurveySphere({ meshRef }: { meshRef: React.RefObject<Mesh | null> }) {
     });
   }, [sdf]);
 
+  // three.js never frees GPU resources on its own — release the shader and the
+  // cloned SDF texture when the memo recomputes or the sphere unmounts.
+  useEffect(
+    () => () => {
+      material.uniforms.uSdf.value.dispose();
+      material.dispose();
+    },
+    [material],
+  );
+
   return (
     <mesh ref={meshRef} material={material}>
       <sphereGeometry args={[RADIUS, 96, 96]} />
@@ -250,6 +260,7 @@ function Rim() {
       }),
     [],
   );
+  useEffect(() => () => material.dispose(), [material]);
   return (
     <mesh material={material}>
       <sphereGeometry args={[RADIUS * 1.002, 64, 64]} />
@@ -271,6 +282,8 @@ function bracketGeometry(s: number, arm: number) {
   return geo;
 }
 
+// Module-level singletons shared by every Marker — kept alive for the page's
+// lifetime on purpose; per-instance disposal would break the other markers.
 const HUB_BRACKET = bracketGeometry(0.04, 0.017);
 const SITE_BRACKET = bracketGeometry(0.029, 0.012);
 
