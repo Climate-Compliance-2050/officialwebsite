@@ -37,6 +37,7 @@ export function ContactForm() {
 
     // Map an audience intent or licence tier onto the "What do you need?" options.
     const INTENT_TO_INTEREST: Record<string, string> = {
+      assess: "Assess an asset or territory",
       supplier: "Assess an asset or territory",
       demander: "Explore the platform (demo)",
       facilitator: "Partnership / join the ecosystem",

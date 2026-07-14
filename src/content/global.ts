@@ -314,7 +314,7 @@ export const globalPage = {
     eyebrow: "Why this matters for C2050",
     headline: "A fragmenting map. One binding problem.",
     body: "Every jurisdiction on this map carries its own tenure law, carbon rights and eligibility rules. C2050 locks legal and regulatory standing to the coordinate through the Data Cube — the geospatial ⊕ legal bind that lets an environmental asset stand as a financial one across borders.",
-    primaryCta: { label: "Assess an Asset", href: "/contact" },
+    primaryCta: { label: "Assess an Asset", href: "/contact?intent=assess" },
     secondaryCta: { label: "Inside the Data Cube", href: "/about" },
   },
 };

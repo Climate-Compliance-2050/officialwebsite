@@ -54,7 +54,11 @@ export default async function EcosystemPage({
             <Reveal delay={0.1}>
               <div className="rounded-2xl bg-slate-50 p-8 lg:mt-14">
                 <p className="text-doc text-base leading-7 text-navy-900/70">
-                  {ecosystemPage.network.agnostic}
+                  {ecosystemPage.network.agnostic.pre}
+                  <strong className="font-semibold text-navy-900">
+                    {ecosystemPage.network.agnostic.emphasis}
+                  </strong>
+                  {ecosystemPage.network.agnostic.post}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <ButtonLink href="/partners" variant="secondary" arrow>

@@ -6,6 +6,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ButtonLink } from "@/components/ui/Button";
 import { MissionVision } from "@/components/home/MissionVision";
+import { DataCubeStack } from "@/components/home/DataCubeStack";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
 import { site } from "@/content/site";
@@ -48,19 +49,25 @@ export default async function AboutPage({
 
       <MissionVision />
 
+      {/* The Data Cube instrument — the same interactive rig as the home page,
+          mounted here so the framework "jumps off the page" (Alan Barry, July 2026).
+          CTA hidden: it links to this page. */}
+      <DataCubeStack hideCta />
+
       {/* Data Cube deep-dive */}
       <section className="dark-section grain relative overflow-hidden bg-navy-950 pb-20 text-white lg:pb-28">
         {/* ambient backdrop: graticule + survey washes */}
         <SurveyBackdrop ticks={false} />
-        {/* oversized brand mark watermark */}
-        <Image
-          src="/brand/mark-white.webp"
-          alt=""
+        {/* oversized brand mark watermark — slow aperture rotation on an inner
+            div so it doesn't clobber the -translate-y-1/2 centering */}
+        <div
           aria-hidden
-          width={520}
-          height={520}
-          className="pointer-events-none absolute -right-24 top-1/2 hidden -translate-y-1/2 select-none opacity-[0.05] lg:block"
-        />
+          className="pointer-events-none absolute -right-24 top-1/2 hidden h-[520px] w-[520px] -translate-y-1/2 select-none opacity-[0.05] lg:block"
+        >
+          <div className="relative h-full w-full motion-safe:animate-spin-slower">
+            <Image src="/brand/mark-white.webp" alt="" fill sizes="520px" className="object-contain" />
+          </div>
+        </div>
 
         <div className="relative mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8 lg:pt-28">
           <div className="grid items-center gap-14 lg:grid-cols-2">
@@ -84,39 +91,44 @@ export default async function AboutPage({
               </ul>
             </Reveal>
 
-            {/* information pyramid */}
-            <div className="mx-auto w-full max-w-md">
-              <ol className="flex flex-col-reverse items-center gap-2">
+            {/* information pyramid — instrument register: stepped bars with the
+                description always in view; the apex is the valuable asset */}
+            <div className="w-full">
+              <ol className="flex flex-col-reverse gap-2.5">
                 {dataCube.pyramid.map((level, i) => {
                   // width grows toward the base (i=0 is Data, the widest)
-                  const scale = 0.55 + ((i + 1) / dataCube.pyramid.length) * 0.45;
+                  const scale = 0.45 + ((i + 1) / dataCube.pyramid.length) * 0.55;
+                  const apex = i === dataCube.pyramid.length - 1;
                   return (
                     <Reveal
                       as="li"
                       key={level.level}
                       delay={(dataCube.pyramid.length - i) * 0.08}
                       y={16}
-                      className="group relative"
+                      className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4"
                     >
                       <div
-                        className={`rounded-xl border px-6 py-3 text-center transition-colors duration-200 ${
-                          i === dataCube.pyramid.length - 1
-                            ? "border-green-400/50 bg-green-500/20"
-                            : "border-white/12 bg-white/5 hover:border-blue-400/40 hover:bg-blue-500/10"
+                        className={`relative flex shrink-0 items-center gap-3 rounded-sm border px-4 py-2.5 ${
+                          apex
+                            ? "corners border-green-400/50 bg-green-500/20"
+                            : "border-white/12 bg-white/5"
                         }`}
-                        style={{ width: `${scale * 26}rem`, maxWidth: "min(100%, 90vw)" }}
+                        style={{ width: `${scale * 15}rem`, maxWidth: "100%" }}
                       >
+                        <span
+                          className={`tnum font-mono text-[10px] ${apex ? "text-green-300" : "text-white/45"}`}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
                         <span className="text-sm font-semibold">{level.level}</span>
                       </div>
-                      <p className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 w-72 -translate-x-1/2 rounded-xl border border-white/10 bg-navy-900 p-4 text-xs leading-5 text-white/75 opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100">
-                        {level.body}
-                      </p>
+                      <p className="text-xs leading-5 text-white/65 sm:flex-1">{level.body}</p>
                     </Reveal>
                   );
                 })}
               </ol>
-              <p className="mt-6 text-center text-xs text-white/60">
-                Hover each level: raw data ascends into a structured, evidence-based asset profile.
+              <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.18em] text-white/50">
+                Raw data ascends into a valuable environmental asset
               </p>
             </div>
           </div>

@@ -214,6 +214,12 @@ export function Navbar() {
           >
             {nav.cta.label}
           </LocaleLink>
+          <LocaleLink
+            href={nav.ctaSecondary.href}
+            className="btn-sheen ml-2 rounded-sm bg-green-500 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-green-600 hover:shadow-lg hover:shadow-green-500/25 active:scale-[0.98]"
+          >
+            {nav.ctaSecondary.label}
+          </LocaleLink>
           {SHOW_LOCALE_TOGGLE && (
             <LocaleToggle lang={lang} overDark={overDark} onSwitch={switchLocale} className="ml-4 pl-1" />
           )}
@@ -282,6 +288,12 @@ export function Navbar() {
                 className="block rounded-sm bg-green-500 px-5 py-3 text-center text-base font-semibold text-white"
               >
                 {nav.cta.label}
+              </LocaleLink>
+              <LocaleLink
+                href={nav.ctaSecondary.href}
+                className="block rounded-sm bg-green-500 px-5 py-3 text-center text-base font-semibold text-white"
+              >
+                {nav.ctaSecondary.label}
               </LocaleLink>
             </div>
           </motion.div>

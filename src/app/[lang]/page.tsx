@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
+import { IntroStatement } from "@/components/home/IntroStatement";
 import { Problem } from "@/components/home/Problem";
 import { DataCubeStack } from "@/components/home/DataCubeStack";
 import { WorkflowStrip } from "@/components/home/WorkflowStrip";
@@ -18,6 +19,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <IntroStatement />
       <Problem />
       <DataCubeStack />
       <WorkflowStrip />

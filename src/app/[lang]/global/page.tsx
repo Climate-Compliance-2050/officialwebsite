@@ -80,6 +80,39 @@ export default async function GlobalPage({
 
       <SectionNav />
 
+      {/* C2050 tie-in — at the top, parallel to the market-evolution framing,
+          per Alan Barry (July 2026): "lost at the end of the section" */}
+      <section className="dark-section grain relative overflow-hidden bg-navy-950 py-16 text-white lg:py-20">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <SurveyBackdrop ticks={false} />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+            <Reveal>
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
+                {g.tieIn.eyebrow}
+              </p>
+              <h2 className="mt-4 font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+                {g.tieIn.headline}
+              </h2>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <div className="corners relative border border-white/15 bg-white/[0.04] p-6 sm:p-8">
+                <p className="text-base leading-7 text-white/75">{g.tieIn.body}</p>
+                <div className="mt-7 flex flex-wrap gap-4">
+                  <ButtonLink href={g.tieIn.primaryCta.href} arrow>
+                    {g.tieIn.primaryCta.label}
+                  </ButtonLink>
+                  <ButtonLink href={g.tieIn.secondaryCta.href} variant="ghost-dark" arrow>
+                    {g.tieIn.secondaryCta.label}
+                  </ButtonLink>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       {/* Coverage trajectory */}
       <section id="coverage" className="scroll-mt-32 bg-white py-20 lg:scroll-mt-40 lg:py-28">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -142,33 +175,6 @@ export default async function GlobalPage({
         </div>
       </section>
 
-      {/* C2050 tie-in */}
-      <section className="dark-section grain relative overflow-hidden bg-navy-950 py-20 text-white lg:py-28">
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <SurveyBackdrop ticks={false} />
-        </div>
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Reveal className="max-w-3xl">
-            <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
-              {g.tieIn.eyebrow}
-            </p>
-            <h2 className="mt-4 font-serif text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-              {g.tieIn.headline}
-            </h2>
-            <p className="text-doc mt-6 max-w-2xl text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
-              {g.tieIn.body}
-            </p>
-            <div className="mt-9 flex flex-wrap gap-4">
-              <ButtonLink href={g.tieIn.primaryCta.href} arrow>
-                {g.tieIn.primaryCta.label}
-              </ButtonLink>
-              <ButtonLink href={g.tieIn.secondaryCta.href} variant="ghost-dark" arrow>
-                {g.tieIn.secondaryCta.label}
-              </ButtonLink>
-            </div>
-          </Reveal>
-        </div>
-      </section>
     </>
   );
 }

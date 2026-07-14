@@ -757,7 +757,7 @@ function useLatestRef<T>(value: T) {
   return ref;
 }
 
-export function DataCubeStack() {
+export function DataCubeStack({ hideCta = false }: { hideCta?: boolean } = {}) {
   const { dataCube } = useContent();
   const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
@@ -1392,11 +1392,13 @@ export function DataCubeStack() {
                 );
               })}
             </ul>
-            <Reveal delay={0.2} className="mt-9">
-              <ButtonLink href={dataCube.cta.href} variant="ghost-dark" arrow>
-                {dataCube.cta.label}
-              </ButtonLink>
-            </Reveal>
+            {!hideCta && (
+              <Reveal delay={0.2} className="mt-9">
+                <ButtonLink href={dataCube.cta.href} variant="ghost-dark" arrow>
+                  {dataCube.cta.label}
+                </ButtonLink>
+              </Reveal>
+            )}
           </div>
         </div>
       </div>

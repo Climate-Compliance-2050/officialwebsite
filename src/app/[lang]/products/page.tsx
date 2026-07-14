@@ -5,6 +5,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { BrandIcon } from "@/components/ui/BrandIcon";
 import { ButtonLink } from "@/components/ui/Button";
 import { LicensingStudio } from "@/components/products/LicensingStudio";
+import { EvidenceChain } from "@/components/products/EvidenceChain";
 import { getDictionary } from "@/content/dictionaries";
 import type { Locale } from "@/content/locales";
 import { site } from "@/content/site";
@@ -47,6 +48,9 @@ export default async function ProductsPage({
             <p className="text-doc mt-4 text-base leading-7 text-navy-900/70">
               {productsPage.platform.sandbox}
             </p>
+          </Reveal>
+          <Reveal delay={0.08} className="mt-10">
+            <EvidenceChain chain={productsPage.platform.chain} />
           </Reveal>
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {productsPage.platform.modules.map((module, i) => (

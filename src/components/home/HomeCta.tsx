@@ -36,6 +36,7 @@ export function HomeCta() {
             <ButtonLink href={homeCta.primaryCta.href} arrow>
               {homeCta.primaryCta.label}
             </ButtonLink>
+            <ButtonLink href={homeCta.assessCta.href}>{homeCta.assessCta.label}</ButtonLink>
             <ButtonLink href={homeCta.secondaryCta.href} variant="ghost-dark">
               {homeCta.secondaryCta.label}
             </ButtonLink>

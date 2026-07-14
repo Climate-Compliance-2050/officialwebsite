@@ -3,25 +3,25 @@
 export const aboutPage = {
   hero: {
     eyebrow: "About Us",
-    headline: "Intelligence infrastructure for the environmental asset economy.",
-    body: "C2050 is a product, service and advisory platform delivering flexible, scalable infrastructure to assess, structure and monitor environmental assets, their value spanning ecological, social, economic, political and territorial dimensions.",
+    headline: "Providing geographically scalable environmental asset data and intelligence.",
+    body: "C2050 delivers intelligence infrastructure for the environmental asset economy — a product, service and advisory platform delivering flexible, scalable infrastructure to assess, structure and monitor environmental assets, their value spanning legal and regulatory compliance, ecological, social, economic, political and territorial dimensions.",
   },
   dataCube: {
-    eyebrow: "The Data Cube",
-    headline: "Every asset, a structured information object.",
-    body: "C2050's fundamental innovation is the Data Cube: a conceptual and operational framework that treats each unit of environmental asset (one tonne of carbon, one kWh of clean energy, one cubic metre of clean water) as a structured, multi-dimensional information object. A C2050-assessed environmental asset derives its credibility from an immutable information chain linking every data input (geographical, legal, scientific, social) to its verified origin.",
+    eyebrow: "C2050 · The Data Cube",
+    headline: "Treating every asset as a structured information object.",
+    body: "C2050's fundamental innovation is the Data Cube: a conceptual and operational framework that treats each unit of environmental asset (one tonne of carbon, one kWh of clean energy, one cubic metre of clean water) as a structured, multi-dimensional information object. A C2050-assessed environmental asset derives its credibility from an immutable information chain linking every data input (geographical, legal, scientific, technical and social) to its verified origin.",
     pyramid: [
       { level: "Data", body: "Raw geospatial, legal and environmental data from satellite imagery, remote sensing, public registries, scientific models and proprietary databases." },
       { level: "Information", body: "Data processed into structured, comparable information within the asset's information chain." },
       { level: "Knowledge", body: "Information analysed into actionable knowledge: risks, gaps, eligibility and compliance posture." },
       { level: "Intelligence", body: "Knowledge communicated as decision-grade intelligence, structured for buyers, regulators and partners." },
-      { level: "Asset", body: "An evidence-based, legally structured environmental asset profile that markets can rely on." },
+      { level: "Asset", body: "A valuable environmental asset: an evidence-based, legally structured profile that markets can rely on." },
     ],
     principles: ["Origin", "Impact", "Legality", "Veracity", "Integrity"],
   },
   techFoundation: {
-    eyebrow: "Technological Foundation",
-    headline: "Enterprise infrastructure, built for sovereignty.",
+    eyebrow: "C2050 · Technological Foundation",
+    headline: "Enterprise infrastructure for sovereign environmental asset balance sheets.",
     body: "The platform layer that lets every participant in the environmental asset market (developers, landowners, buyers, governments, rating agencies, insurers, legal firms, financial institutions) operate with structured visibility into the integrity, quality and regulatory compliance of the assets they generate, fund, acquire or trade.",
     pillars: [
       {
@@ -51,7 +51,7 @@ export const aboutPage = {
     ],
   },
   focus: {
-    headline: "Starting with nature. Built to expand.",
+    headline: "Starting with nature. Built to scale and diversify.",
     body: "Initial focus on nature-based solutions (carbon credits, emission reductions and removals), evolving in time to energy, transportation and the broader environmental asset economy. Insights are delivered through a SaaS platform designed to support digital monitoring, reporting and verification (D-MRV).",
   },
 };
@@ -122,17 +122,17 @@ export const storyPage = {
     {
       period: "The gap",
       title: "A market without an evidence layer",
-      body: "Carbon credits and other environmental assets are generated across different geographies and a multitude of international standards. Assessing their veracity and quality demands consistent, timely and reliable intelligence, which the market lacked.",
+      body: "Carbon credits and other environmental assets are generated across different geographies and from a multitude of international standards. Assessing their veracity and quality demands consistent, timely and reliable intelligence, which the market still lacks. C2050 is addressing this critical market need.",
     },
     {
       period: "June 2024",
       title: "Founded in Dublin",
-      body: "Following comprehensive international legal and tax advice, the C2050 holding company was formally established in Dublin, Ireland, a trusted regulatory framework positioning the company on the international stage.",
+      body: "Following comprehensive international legal and tax advice, the C2050 holding company was formally established in Dublin, Ireland, a trusted legal & regulatory framework positioning the company on the international stage.",
     },
     {
       period: "2024–2025",
       title: "Five disciplines, one platform",
-      body: "C2050 combined geospatial, legal, regulatory, scientific and technical knowledge into a single intelligence platform, with operational hubs established in Latin America.",
+      body: "C2050 combined geospatial, legal, regulatory, scientific and technical knowledge into a single intelligence platform, with operational hubs established initially in Latin America before scaling globally.",
     },
     {
       period: "Today",

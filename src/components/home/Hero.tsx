@@ -214,6 +214,7 @@ export function Hero() {
             <ButtonLink href={hero.primaryCta.href} arrow>
               {hero.primaryCta.label}
             </ButtonLink>
+            <ButtonLink href={hero.assessCta.href}>{hero.assessCta.label}</ButtonLink>
             <ButtonLink href={hero.secondaryCta.href} variant="ghost-dark">
               {hero.secondaryCta.label}
             </ButtonLink>

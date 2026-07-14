@@ -19,6 +19,10 @@ export const site = {
 export const nav = {
   links: [
     {
+      label: "Home",
+      href: "/",
+    },
+    {
       label: "About",
       href: "/about",
       children: [
@@ -38,21 +42,33 @@ export const nav = {
       ],
     },
     {
-      label: "Global",
+      label: "Global Market",
       href: "/global",
     },
   ],
   cta: { label: "Submit a Territory", href: "/contact" },
+  ctaSecondary: { label: "Assess an Asset", href: "/contact?intent=assess" },
 };
 
 export const hero = {
-  eyebrow: "Trust runs on evidence. Evidence runs on legal & regulatory",
-  headline: "Every coordinate is subject to a law.",
+  eyebrow: "Evidence runs on a legal & regulatory framework",
+  headline: "Every geo-spatial coordinate is subject to a law.",
   subheadline:
-    "C2050 integrates legal and regulatory intelligence with geospatial coordinates, so every point on the map carries the rules that govern it, from carbon rights to Article 6 eligibility.",
+    "C2050 integrates legal and regulatory intelligence with geospatial coordinates, so every point on the map carries the rules that govern it. These rules dictate, for instance, the carbon rights and Article 6 eligibility of environmental assets generated from each parcel of land.",
   primaryCta: { label: "Submit a Territory", href: "/contact" },
+  assessCta: { label: "Assess an Asset", href: "/contact?intent=assess" },
   secondaryCta: { label: "See How It Works", href: "/products" },
-  caption: "Other platforms map the territory. We map the law that governs it.",
+  caption: "Other platforms map the territory. We map the laws that govern it.",
+};
+
+/** Home intro statement — who and what C2050 is (Alan Barry, July 2026),
+ *  plus the bridge from the environmental asset economy to carbon markets. */
+export const intro = {
+  eyebrow: "Who we are",
+  headline: "C2050 delivers intelligence infrastructure for the environmental asset economy.",
+  body: "C2050 is a product, service and advisory platform delivering flexible, scalable infrastructure to assess, structure and monitor environmental assets, their value spanning legal and regulatory compliance, ecological, social, economic, political and territorial dimensions.",
+  bridge:
+    "That economy reaches the market first through carbon — credits, emission reductions and removals — where the integrity of every claim is under the most scrutiny. C2050 starts there.",
 };
 
 /** Hero "Global Asset Monitor" console chrome. */
@@ -180,7 +196,7 @@ export const missionVision = {
 export const workflow = {
   eyebrow: "How It Works",
   headline: "Intelligence across the asset lifecycle.",
-  body: "C2050 services follow the life of an environmental asset, from first screening to ongoing monitoring and reporting.",
+  body: "C2050 services follow the life of an environmental asset, from initial screening to ongoing monitoring and reporting.",
   steps: [
     {
       name: "Screen",
@@ -211,7 +227,7 @@ export const workflow = {
 
 export const clarifier = {
   headline: "What C2050 is, and is not",
-  is: "C2050 is decision-support intelligence and compliance infrastructure. We give market participants the evidence base to act with confidence.",
+  is: "C2050 is decision-support intelligence and compliance infrastructure: a product, service and advisory platform that gives market participants the evidence base to assess, structure and monitor environmental assets with confidence.",
   isNot:
     "C2050 is not a carbon standard, registry, broker, verification and validation body, or investment adviser. We do not issue credits, certify projects or provide investment advice.",
   valuesEyebrow: "Operating principles",
@@ -221,6 +237,7 @@ export const homeCta = {
   headline: "Bring decision-grade confidence to your next environmental asset.",
   body: "Talk to our team about screening a territory, assessing a project, or integrating C2050 intelligence into your workflow.",
   primaryCta: { label: "Submit a Territory", href: "/contact" },
+  assessCta: { label: "Assess an Asset", href: "/contact?intent=assess" },
   secondaryCta: { label: "See How It Works", href: "/products" },
 };
 
@@ -248,7 +265,7 @@ export const footer = {
         { label: "Products", href: "/products" },
         { label: "Services", href: "/services" },
         { label: "Partners", href: "/partners" },
-        { label: "Global", href: "/global" },
+        { label: "Global Market", href: "/global" },
       ],
     },
   ],

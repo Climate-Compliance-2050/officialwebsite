@@ -209,7 +209,7 @@ export default async function ServicesPage({
             </h2>
             <p className="text-doc mt-5 text-base leading-7 text-white/70 sm:text-lg">
               Tell us about your parcel, project or jurisdiction. We&apos;ll map it to the
-              right study — from a first screening to a validation-ready evidence base.
+              right study — from an initial screening to a validation-ready evidence base.
             </p>
             <div className="mt-9 flex flex-wrap gap-4">
               <ButtonLink href="/contact" arrow>

@@ -11,8 +11,13 @@ export const ecosystemPage = {
   network: {
     headline: "The C2050 ecosystem",
     body: "No single entity can solve the complexities of the global carbon market in isolation. C2050 operates a controlled digital ecosystem where qualified partners offer complementary services directly through the platform, integrating standard-setters, Validation and Verification Bodies (VVBs) and certified auditors in a single environment that mitigates conflicts of interest and gives clients access to high-quality intelligence.",
-    agnostic:
-      "The ecosystem is technology- and standard-agnostic: each participant configures the providers, standards and data sources that fit their needs. The network expands continuously as the platform grows into new markets.",
+    /* `emphasis` renders bold — Alan Barry (July 2026) asked for the agnostic
+       positioning to be foregrounded. */
+    agnostic: {
+      pre: "The ecosystem is ",
+      emphasis: "technology- and standard-agnostic",
+      post: ": each participant configures the providers, standards and data sources that fit their needs. The network expands continuously as the platform grows into new markets.",
+    },
   },
   actors: [
     { label: "Standards & methodologies", icon: "badges" as BrandIconName },
@@ -34,13 +39,28 @@ export const productsPage = {
   hero: {
     eyebrow: "Products",
     headline: "Actionable intelligence for high-integrity environmental assets.",
-    body: "The infrastructure layer that turns fragmented environmental data into structured, evidence-based asset intelligence, from first screening to ongoing monitoring.",
+    body: "The infrastructure layer that turns fragmented environmental data into structured, evidence-based asset intelligence, from initial screening to ongoing monitoring.",
   },
   platform: {
     headline: "The platform",
     body: "At the core of C2050 is a highly scalable SaaS platform built on our proprietary Data Cube framework. Raw geospatial, legal and environmental data moves through an immutable information chain, so every conclusion traces back to its source evidence.",
     sandbox:
-      "Whether you originate, manage or retire carbon credits, the platform's sandbox environment supports evidence-based integrity assessment of any underlying nature-based project: regulatory compliance, legal rights and scientific credibility in one view.",
+      "Whether you originate, manage or retire carbon credits, the platform's sandbox environment supports evidence-based integrity assessment of any underlying nature-based project — including regulatory compliance, legal rights and scientific credibility in one view.",
+    /* Evidence-chain instrument (Alan Barry, July 2026) — illustrates the
+       "immutable information chain" sentence above. Link labels mirror the
+       About-page information pyramid; notes are drawn from its level bodies —
+       no new claims. */
+    chain: {
+      aside: "The information chain",
+      caption: "Every conclusion traces back to its source evidence.",
+      links: [
+        { code: "01", label: "Data", note: "Verified origin" },
+        { code: "02", label: "Information", note: "Structured & comparable" },
+        { code: "03", label: "Knowledge", note: "Risks & eligibility" },
+        { code: "04", label: "Intelligence", note: "Decision-grade" },
+        { code: "05", label: "Asset", note: "Evidence-based profile" },
+      ],
+    },
     modules: [
       { id: "geo", name: "Geospatial module", short: "Geospatial", body: "Boundary verification, overlap with protected and tenure layers, land-use dynamics and advanced geoprocessing.", icon: "geographical" as BrandIconName, core: true },
       { id: "legal", name: "Legal module", short: "Legal", body: "Land tenure, carbon rights and contractual chains mapped to applicable law.", icon: "legal-regulatory" as BrandIconName, core: true },
@@ -52,7 +72,7 @@ export const productsPage = {
   },
   tiersIntro: {
     headline: "Platform licensing tiers",
-    body: "Four tiers of analytical depth, from the standard C2050 interface to a fully customised white-label deployment. Seat licences run on annual or monthly terms; pay-as-you-go per-study credits sit alongside for occasional use. Every tier is quoted to scope.",
+    body: "Four tiers of analytical depth, from the standard C2050 interface to a fully customised white-label deployment. Seat licences run on annual or monthly terms; pay-as-you-go per-study credits also sit alongside for occasional use. Every tier is tailored and quoted to cover its target scope.",
   },
   /** Billing model. Seat licences (annual/monthly) for the tiers; PAYG is a separate lane. */
   billing: {
@@ -202,13 +222,13 @@ export const servicesPage = {
   hero: {
     eyebrow: "Services",
     headline: "Hard information on land, projects and territories.",
-    body: "C2050 studies integrate legal and regulatory analysis with geospatial intelligence — georeferenced, decision-grade. From a rapid first screening to a validation-ready evidence base, at scales from a single parcel to an entire municipality.",
+    body: "C2050 studies integrate legal and regulatory analysis with geospatial intelligence — georeferenced, decision-grade intelligence. From a rapid initial screening to a validation-ready evidence base, at varying scales from a single parcel of land to an entire municipality.",
   },
   /** Value-proposition band: two disciplines, one integrated study. */
   valueProp: {
     eyebrow: "What a C2050 study is",
     headline: "Studied with two kinds of expert eyes.",
-    body: "Every study integrates legal and regulatory analysis — the rigour of a specialised environmental-law firm — with geospatial intelligence from satellite and sensory data. Georeferenced and decision-grade: hard information, evidence not assertions.",
+    body: "Every study integrates legal and regulatory analysis — the rigour of a specialised environmental-law firm — with geospatial intelligence from satellite and sensory data. Georeferenced and decision-grade hard information — evidence, not assertions.",
     lenses: [
       {
         label: "Legal & Regulatory",
@@ -225,7 +245,7 @@ export const servicesPage = {
   },
   catalogue: {
     eyebrow: "The studies",
-    headline: "Screen wide, then go deep.",
+    headline: "From high-level screening to comprehensive, detailed analysis.",
     body: "Nine studies along one funnel. Filter by who you are and how far you need to go — each can be requested directly.",
     empty: "No studies match that filter.",
   },
@@ -324,7 +344,7 @@ export const servicesPage = {
     {
       code: "09",
       name: "Locally Determined Contribution",
-      body: "A study calculating a jurisdiction's specific contribution to Brazil's NDC, aligning local results with National GHG Inventory standards.",
+      body: "A study calculating a jurisdiction's specific contribution to the national NDC, aligning local results with National GHG Inventory standards.",
       deliverable: "A study of the jurisdiction's NDC contribution, aligned to the National GHG Inventory.",
       depth: "Territorial",
       granularity: "Jurisdiction",
