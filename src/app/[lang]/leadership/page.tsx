@@ -190,6 +190,13 @@ export default async function LeadershipPage({
                 backgroundSize: "56px 56px",
               }}
             />
+            {/* plate stamp — aperture mark seated like a survey plate's signature */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute bottom-4 right-4 h-14 w-14 opacity-[0.06] motion-safe:animate-spin-slower"
+            >
+              <Image src="/brand/mark-white.webp" alt="" fill sizes="56px" className="object-contain" />
+            </div>
             <div className="relative">
               <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
                 Work with us

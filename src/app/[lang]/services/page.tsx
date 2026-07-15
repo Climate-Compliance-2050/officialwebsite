@@ -184,6 +184,15 @@ export default async function ServicesPage({
             />
           </div>
         </div>
+
+        {/* plate stamp — aperture mark seated like a survey plate's signature
+            (same register as CoverageCurve): C2050 produced this catalogue. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-7 right-5 h-14 w-14 opacity-[0.07] motion-safe:animate-spin-slower"
+        >
+          <Image src="/brand/mark.webp" alt="" fill sizes="56px" className="object-contain" />
+        </div>
       </section>
 
       {/* Closing band: scope-it CTA over earth observation. */}

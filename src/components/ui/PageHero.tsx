@@ -52,7 +52,17 @@ export function PageHero({ eyebrow, headline, body, media, backdrop, children }:
       </div>
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
+          {/* masthead lockup — the aperture mark seats the eyebrow like a letterhead,
+              one systematic brand instance per interior page (same register as IntroStatement) */}
+          <p className="flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.18em] text-green-400">
+            <Image
+              src="/brand/mark-white.webp"
+              alt=""
+              aria-hidden
+              width={14}
+              height={14}
+              className="opacity-60"
+            />
             {eyebrow}
           </p>
           <h1 className="mt-4 max-w-3xl font-serif text-4xl font-semibold leading-[1.12] tracking-tight sm:text-5xl">

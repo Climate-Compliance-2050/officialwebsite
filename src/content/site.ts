@@ -51,10 +51,10 @@ export const nav = {
 };
 
 export const hero = {
-  eyebrow: "Evidence runs on a legal & regulatory framework",
-  headline: "Every geo-spatial coordinate is subject to a law.",
+  eyebrow: "Climate Compliance 2050 · Legal RegTech",
+  headline: "Compliance intelligence for environmental assets.",
   subheadline:
-    "C2050 integrates legal and regulatory intelligence with geospatial coordinates, so every point on the map carries the rules that govern it. These rules dictate, for instance, the carbon rights and Article 6 eligibility of environmental assets generated from each parcel of land.",
+    "C2050 integrates legal and regulatory analysis with geospatial data. Land tenure, carbon rights and Article 6 eligibility, locked to the coordinates of every asset we study — the evidence base to assess, structure and monitor carbon credits before decisions are made.",
   primaryCta: { label: "Submit a Territory", href: "/contact" },
   assessCta: { label: "Assess an Asset", href: "/contact?intent=assess" },
   secondaryCta: { label: "See How It Works", href: "/products" },

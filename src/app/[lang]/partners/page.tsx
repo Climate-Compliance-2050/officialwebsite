@@ -67,7 +67,7 @@ export default async function PartnersPage({
           </div>
 
           <Reveal delay={0.15} className="mx-auto mt-16 max-w-3xl">
-            <blockquote className="rounded-2xl bg-slate-50 p-10 text-center">
+            <blockquote className="relative overflow-hidden rounded-2xl bg-slate-50 p-10 text-center">
               <Quote className="mx-auto h-8 w-8 text-green-500" aria-hidden />
               <p className="mt-5 font-serif text-xl italic leading-relaxed text-navy-900">
                 “{partnersPage.quote.text}”
@@ -76,6 +76,13 @@ export default async function PartnersPage({
                 <span className="font-semibold text-navy-900">{partnersPage.quote.author}</span> ·{" "}
                 {partnersPage.quote.role}
               </footer>
+              {/* plate stamp — aperture mark seated like a survey plate's signature */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute bottom-4 right-4 h-12 w-12 opacity-[0.08] motion-safe:animate-spin-slower"
+              >
+                <Image src="/brand/mark.webp" alt="" fill sizes="48px" className="object-contain" />
+              </div>
             </blockquote>
           </Reveal>
 
