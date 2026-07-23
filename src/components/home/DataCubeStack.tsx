@@ -998,7 +998,7 @@ export function DataCubeStack({ hideCta = false }: { hideCta?: boolean } = {}) {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-14 lg:grid-cols-2">
           {/* ---------------- Slice instrument ---------------- */}
-          <div className="order-2 flex items-stretch justify-center gap-2 lg:order-1">
+          <div className="order-2 flex min-w-0 items-stretch justify-center gap-2 overflow-hidden lg:order-1 lg:overflow-visible">
             <AxisRail lit={litRungs} />
             <div
               ref={stageRef}
