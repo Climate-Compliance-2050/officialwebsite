@@ -52,21 +52,20 @@ export const nav = {
 
 export const hero = {
   eyebrow: "Climate Compliance 2050 · Legal RegTech",
-  headline: "Compliance intelligence for environmental assets.",
+  headline: "Assessing the legitimacy and the climate impact of carbon credits and other environmental assets",
   subheadline:
-    "C2050 integrates legal and regulatory analysis with geospatial data. Land tenure, carbon rights and Article 6 eligibility, locked to the coordinates of every asset we study — the evidence base to assess, structure and monitor carbon credits before decisions are made.",
-  primaryCta: { label: "Submit a Territory", href: "/contact" },
-  assessCta: { label: "Assess an Asset", href: "/contact?intent=assess" },
+    "C2050 is a product, service and advisory platform delivering flexible, scalable infrastructure to assess, structure and monitor carbon credits and other environmental assets. C2050 assesses the inherent value across legal and regulatory compliance, ecological, social, economic, political and territorial dimensions.",
   secondaryCta: { label: "See How It Works", href: "/products" },
-  caption: "Other platforms map the territory. We map the laws that govern it.",
+  caption:
+    "The environmental asset economy reaches the carbon markets, including emissions reduction & removals, where the integrity of every claim is being challenged.",
 };
 
 /** Home intro statement — who and what C2050 is (Alan Barry, July 2026),
  *  plus the bridge from the environmental asset economy to carbon markets. */
 export const intro = {
   eyebrow: "Who we are",
-  headline: "C2050 delivers intelligence infrastructure for the environmental asset economy.",
-  body: "C2050 is a product, service and advisory platform delivering flexible, scalable infrastructure to assess, structure and monitor environmental assets, their value spanning legal and regulatory compliance, ecological, social, economic, political and territorial dimensions.",
+  headline: "Compliance intelligence for environmental assets.",
+  body: "C2050 integrates legal and regulatory analysis with geospatial data, land tenure and carbon rights, locked to the coordinates of every asset we study.",
   bridge:
     "That economy reaches the market first through carbon — credits, emission reductions and removals — where the integrity of every claim is under the most scrutiny. C2050 starts there.",
 };
@@ -93,7 +92,7 @@ export const stats = [
 export const problem = {
   eyebrow: "The Integrity Gap",
   headline: "Environmental markets run on trust. Trust runs on evidence.",
-  body: "Carbon markets have faced a crisis of confidence. Independent research has questioned the integrity of a large share of issued credits: projects with unclear land rights, unverifiable baselines, and regulatory exposure that surfaces only after transactions close.",
+  body: "Carbon markets have faced a crisis of confidence. Independent research has questioned the integrity of a large share of issued credits: projects with unclear land rights, unverifiable baselines, and regulatory exposure that typically surfaces only after transactions close.",
   points: [
     {
       title: "Fragmented evidence",
@@ -107,18 +106,18 @@ export const problem = {
     },
     {
       title: "Risk discovered too late",
-      body: "Integrity issues are typically found after investment, during diligence, dispute or audit, when remediation is most expensive.",
+      body: "Integrity issues are typically found after investment, during due diligence, dispute or audit, when remediation or resolution is most expensive.",
       icon: "audit" as const,
     },
   ],
   resolution:
-    "C2050 closes this gap with decision-grade confidence: structured risk visibility across every dimension of an environmental asset, before decisions are made.",
+    "C2050 closes the gap by providing structured risk visibility and transparency across every dimension of an environmental asset, before investment decisions are made.",
 };
 
 export const dataCube = {
-  eyebrow: "The Data Cube",
-  headline: "One coordinate. Every pillar. A financial asset.",
-  body: "The Data Cube takes a point from the territory — its coordinates — then binds every pillar to it: geospatial, legal, regulatory, scientific, technical. Legal and regulatory standing, locked to the coordinate. Competitors do geospatial or legal; C2050 binds them — the evidence base that lets an environmental asset stand as a financial one.",
+  eyebrow: "The C2050 Data Cube",
+  headline: "Transforming an environmental asset into a financial security",
+  body: "The C2050 Data Cube takes a point from the territory — its coordinates — then binds a geospatial, legal, regulatory, scientific and technical dimension to it. Competitors typically assess geospatial or legal analysis separately. C2050 intentionally binds all intelligence pillars to provide the evidence base necessary to transform an environmental asset into a financial security.",
   /* Order matches the slab stack in DataCubeStack (SLABS), bottom → top.
      Territory is the base — the point taken from the land; the five pillars
      stack and bind to it. Geospatial (green) sitting under Legal + Regulatory
@@ -152,7 +151,7 @@ export const dataCube = {
 
 export const audiences = {
   eyebrow: "Who We Serve",
-  headline: "Built for every side of the market.",
+  headline: "Tailored for all stakeholders in the environmental asset market",
   segments: [
     {
       name: "Suppliers",

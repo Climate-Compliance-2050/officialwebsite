@@ -3,9 +3,13 @@ import { Reveal } from "@/components/ui/Reveal";
 import { LocaleLink } from "@/components/i18n/LocaleLink";
 
 const partners = [
-  { name: "GEAP", src: "/partners/geap.webp" },
-  { name: "Ludovino Lopes Advogados", src: "/partners/ludovino-lopes.webp" },
-  { name: "Yakarana", src: "/partners/yakarana.webp" },
+  { name: "GEAP", src: "/partners/geap.webp", url: "https://geap.global/" },
+  {
+    name: "Ludovino Lopes Advogados",
+    src: "/partners/ludovino-lopes.webp",
+    url: "https://www.ludovinolopes.com.br/",
+  },
+  { name: "Yakarana", src: "/partners/yakarana.webp", url: "https://www.yakarana.com/" },
 ];
 
 export function PartnersStrip() {
@@ -20,14 +24,21 @@ export function PartnersStrip() {
         <Reveal delay={0.08}>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
             {partners.map((partner) => (
-              <Image
+              <a
                 key={partner.name}
-                src={partner.src}
-                alt={partner.name}
-                width={150}
-                height={56}
-                className="h-10 w-auto opacity-85 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 sm:h-12"
-              />
+                href={partner.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={partner.name}
+              >
+                <Image
+                  src={partner.src}
+                  alt={partner.name}
+                  width={150}
+                  height={56}
+                  className="h-10 w-auto opacity-85 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0 sm:h-12"
+                />
+              </a>
             ))}
           </div>
         </Reveal>

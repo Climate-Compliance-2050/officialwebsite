@@ -260,8 +260,8 @@ export function WorkflowStrip() {
         </div>
 
         <Reveal delay={0.15} className="mt-14 text-center">
-          <ButtonLink href="/services" variant="secondary" arrow>
-            See all services
+          <ButtonLink href="/ecosystem" variant="secondary" arrow>
+            Explore the C2050 Ecosystem
           </ButtonLink>
         </Reveal>
       </div>

@@ -211,23 +211,27 @@ export function Hero() {
             variants={fadeUp}
             className="mt-9 flex flex-wrap gap-4"
           >
-            <ButtonLink href={hero.primaryCta.href} arrow>
-              {hero.primaryCta.label}
-            </ButtonLink>
-            <ButtonLink href={hero.assessCta.href}>{hero.assessCta.label}</ButtonLink>
             <ButtonLink href={hero.secondaryCta.href} variant="ghost-dark">
               {hero.secondaryCta.label}
             </ButtonLink>
           </motion.div>
-          <motion.p
+          <motion.div
             custom={4}
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            className="mt-8 font-serif text-[15px] italic text-white/60"
+            className="mt-8 flex items-start gap-3"
           >
-            {hero.caption}
-          </motion.p>
+            <Image
+              src="/brand/mark-white.webp"
+              alt=""
+              width={20}
+              height={20}
+              aria-hidden
+              className="mt-1 shrink-0 opacity-80"
+            />
+            <p className="font-serif text-[15px] italic text-white/60">{hero.caption}</p>
+          </motion.div>
         </div>
 
         {/* Global Asset Monitor console */}
